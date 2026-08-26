@@ -6,6 +6,7 @@
 const NAV_ITEMS = [
   { id: 'home',   label: 'الرئيسية', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>` },
   { id: 'quran',  label: 'القرآن',   icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.3-4-2-6.5-1.7v13c2.5-.3 4.9.4 6.5 1.7 1.6-1.3 4-2 6.5-1.7v-13c-2.5-.3-4.9.4-6.5 1.7z"/><line x1="12" y1="6.5" x2="12" y2="19.5"/></svg>` },
+  { id: 'listen', label: 'الاستماع', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>` },
   { id: 'prayer', label: 'الصلاة',   icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 3.2"/></svg>` },
   { id: 'tasbih', label: 'السبحة',   icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="4.5" cy="8" r="1.7"/><circle cx="4.5" cy="16" r="1.7"/><circle cx="19.5" cy="8" r="1.7"/><circle cx="19.5" cy="16" r="1.7"/><circle cx="12" cy="3.2" r="1.7"/></svg>` },
   { id: 'azkar',  label: 'الأذكار',  icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c-2-1-4-3.5-4-7 0-5 5-7 5-11 3 1 6 4 6 8 0 1.5-.5 2.5-1 3.5 1.6-.4 3-1.5 4-3 1 1.5 1.5 3 1.5 4.5 0 3.5-2.5 6-6 7"/></svg>` },
@@ -40,6 +41,7 @@ function navigateTo(pageId){
   location.hash = pageId;
 
   if(pageId === 'quran' && window.QuranModule) QuranModule.onEnter();
+  if(pageId === 'listen' && window.ListenModule) ListenModule.onEnter();
   if(pageId === 'hadith' && window.HadithPage) HadithPage.onEnter();
 }
 

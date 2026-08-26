@@ -1,4 +1,4 @@
-const CACHE_NAME = 'azkar-app-v2';
+const CACHE_NAME = 'azkar-app-v3';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const APP_SHELL = [
   './app.js',
   './prayer.js',
   './quran.js',
+  './listen.js',
   './tasbih.js',
   './azkar.js',
   './notifications.js',
@@ -17,7 +18,9 @@ const APP_SHELL = [
   './icon-192-maskable.png',
   './icon-512-maskable.png',
   './favicon.png',
-  './icon-180.png'
+  './icon-180.png',
+  './adhan.mp3',
+  './salawat.mp3'
 ];
 
 self.addEventListener('install', (event)=>{
@@ -44,6 +47,7 @@ self.addEventListener('fetch', (event)=>{
     url.includes('api.alquran.cloud') ||
     url.includes('nominatim.openstreetmap.org') ||
     url.includes('everyayah.com') ||
+    url.includes('mp3quran.net') ||
     url.includes('cdn.aladhan.com');
 
   if(isDynamic){

@@ -1,16 +1,22 @@
 'use strict';
 
 /*
-  ملاحظة هامة:
-  الإشعارات والتنبيهات الصوتية هنا مجدولة محليًا داخل المتصفح بينما التطبيق
-  مفتوح أو يعمل في الخلفية (بعد تثبيته كـ PWA على المتصفحات الداعمة).
-  تشغيل صوت الأذان أو أي صوت تلقائيًا والتطبيق مغلق تمامًا يحتاج خادم Push
-  خلفي (Push Server)، وهو خارج نطاق موقع HTML/CSS/JS ثابت بدون Backend.
-  هذا الحل هو أفضل بديل ممكن: بانر أعلى الشاشة + صوت أذان فعلي + إشعار نظام،
-  يعمل طالما التطبيق مفتوح أو في الخلفية القريبة.
+  ملاحظة هامة وصادقة عن حدود المتصفح:
+  الإشعارات والأصوات هنا (الأذان، تذكير الصلاة على النبي) تعمل فعليًا
+  عبر ملفات صوتية محلية (sounds/adhan.mp3 و sounds/salawat.mp3) بينما
+  التطبيق مفتوح أو في الخلفية القريبة (تبديل تطبيقات بدون إغلاقه فعليًا).
+
+  هذا حد تقني في منصة الويب نفسها وليس قصورًا في الكود: عندما يُغلق
+  التطبيق تمامًا (يُزال من قائمة التطبيقات الأخيرة)، يتوقف تنفيذ أي
+  JavaScript تمامًا، و Service Worker نفسه لا يملك القدرة على تشغيل
+  ملفات صوت (لا يوجد Audio API داخله) — فلا يوجد أي طريقة على الويب
+  (ولا حتى بخادم Push) لتشغيل صوت تلقائي والتطبيق مغلق تمامًا؛ هذا
+  متاح فقط لتطبيقات native الحقيقية. لذلك: اترك التطبيق مفتوحًا في
+  الخلفية (لا تُغلقه بالكامل) ليستمر سماع الأذان والتذكيرات.
 */
 
-const ADHAN_AUDIO_URL = 'https://cdn.aladhan.com/audio/adhans/a9.mp3'; // مشاري العفاسي
+const ADHAN_AUDIO_URL = 'sounds/adhan.mp3';
+const SALAWAT_AUDIO_URL = 'sounds/salawat.mp3';
 
 const NotificationsModule = (()=>{
   let checkInterval = null;
@@ -75,47 +81,19 @@ const NotificationsModule = (()=>{
   }
 
   /* ---------------- salawat (blessings on the Prophet) reminder ---------------- */
-  function playChime(){
+  let salawatAudioEl = null;
+  function playSalawatAudio(){
     try{
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const notes = [660, 880, 990];
-      notes.forEach((freq, i)=>{
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        const start = ctx.currentTime + i * 0.16;
-        gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(0.18, start + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.9);
-        osc.connect(gain).connect(ctx.destination);
-        osc.start(start);
-        osc.stop(start + 1);
-      });
+      if(!salawatAudioEl) salawatAudioEl = new Audio(SALAWAT_AUDIO_URL);
+      salawatAudioEl.currentTime = 0;
+      salawatAudioEl.play().catch(()=>{ /* autoplay might need a prior user interaction */ });
     }catch(e){ /* silent */ }
   }
 
-  function trySpeakSalawat(){
-    if(!('speechSynthesis' in window)) return false;
-    try{
-      const voices = window.speechSynthesis.getVoices();
-      const arVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ar'));
-      if(!arVoice) return false;
-      const utter = new SpeechSynthesisUtterance('اللهم صل وسلم على نبينا محمد');
-      utter.voice = arVoice;
-      utter.lang = arVoice.lang;
-      utter.rate = 0.9;
-      window.speechSynthesis.speak(utter);
-      return true;
-    }catch(e){ return false; }
-  }
-
   function triggerSalawatReminder(){
-    playChime();
-    const spoke = trySpeakSalawat();
+    playSalawatAudio();
     showToast('🌿 اللهم صلِّ وسلِّم على نبينا محمد ﷺ');
     fireNotification('تذكير', 'اللهم صلِّ وسلِّم على نبينا محمد ﷺ', 'salawat');
-    if(!spoke){ /* chime + banner text is the fallback, already shown */ }
   }
 
   /* ---------------- prayer / azkar / hadith schedule ---------------- */

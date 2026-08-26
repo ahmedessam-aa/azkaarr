@@ -1,13 +1,16 @@
 'use strict';
 
+function pad3g(n){ return String(n).padStart(3,'0'); }
+
+// كل قارئ: folder (ملفات آية بآية لمتابعة القراءة في المصحف) + surahUrl (ملف السورة كاملة متصلاً بدون قطع، للاستماع الحر)
 const RECITERS = [
-  { id: 'alafasy',  folder: 'Alafasy_128kbps',            name: 'مشاري العفاسي' },
-  { id: 'husary',   folder: 'Husary_128kbps',              name: 'محمود خليل الحصري' },
-  { id: 'minshawy', folder: 'Minshawy_Murattal_128kbps',   name: 'محمد صديق المنشاوي' },
-  { id: 'muaiqly',  folder: 'Maher_AlMuaiqly_64kbps',      name: 'ماهر المعيقلي' },
-  { id: 'dosari',   folder: 'Yasser_Ad-Dussary_128kbps',   name: 'ياسر الدوسري' },
-  { id: 'basit',    folder: 'Abdul_Basit_Murattal_192kbps',name: 'عبد الباسط عبد الصمد' },
-  { id: 'sudais',   folder: 'Abdurrahmaan_As-Sudais_192kbps', name: 'عبد الرحمن السديس' },
+  { id: 'alafasy',  folder: 'Alafasy_128kbps',            name: 'مشاري العفاسي',        surahUrl: n => `https://server8.mp3quran.net/download/afs/${pad3g(n)}.mp3` },
+  { id: 'husary',   folder: 'Husary_128kbps',              name: 'محمود خليل الحصري',    surahUrl: n => `https://server13.mp3quran.net/husr/${pad3g(n)}.mp3` },
+  { id: 'minshawy', folder: 'Minshawy_Murattal_128kbps',   name: 'محمد صديق المنشاوي',   surahUrl: n => `https://server10.mp3quran.net/minsh/${pad3g(n)}.mp3` },
+  { id: 'muaiqly',  folder: 'Maher_AlMuaiqly_64kbps',      name: 'ماهر المعيقلي',        surahUrl: n => `https://server12.mp3quran.net/maher/${pad3g(n)}.mp3` },
+  { id: 'dosari',   folder: 'Yasser_Ad-Dussary_128kbps',   name: 'ياسر الدوسري',         surahUrl: n => `https://server11.mp3quran.net/download/yasser/${pad3g(n)}.mp3` },
+  { id: 'basit',    folder: 'Abdul_Basit_Murattal_192kbps',name: 'عبد الباسط عبد الصمد', surahUrl: null },
+  { id: 'sudais',   folder: 'Abdurrahmaan_As-Sudais_192kbps', name: 'عبد الرحمن السديس', surahUrl: null },
 ];
 
 const QuranModule = (()=>{
@@ -287,6 +290,16 @@ const QuranModule = (()=>{
     initSwipe();
   }
 
+  async function getSurahs(){
+    if(surahs.length) return surahs;
+    try{
+      const res = await fetch(`${API_BASE}/surah`);
+      const json = await res.json();
+      surahs = json.data;
+      return surahs;
+    }catch(e){ return []; }
+  }
+
   function onEnter(){
     if(!loadedOnce){
       loadedOnce = true;
@@ -298,7 +311,7 @@ const QuranModule = (()=>{
     renderContinueCard();
   }
 
-  return { onEnter, openSurah, openPage };
+  return { onEnter, openSurah, openPage, getSurahs };
 })();
 window.QuranModule = QuranModule;
 window.RECITERS = RECITERS;
