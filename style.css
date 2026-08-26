@@ -1,0 +1,449 @@
+/* =========================================================
+   أذكار — Design tokens (Dark / Night theme)
+   ========================================================= */
+:root{
+  --night: #080f0c;
+  --night-2: #0c1512;
+  --panel: #101a15;
+  --panel-hi: #16211b;
+  --panel-hover: #1b2721;
+  --ink: #f1f4f1;
+  --ink-soft: #a9b5ad;
+  --ink-faint: #71807a;
+
+  --emerald: #17b378;
+  --emerald-bright: #22d693;
+  --emerald-deep: #0a3d2c;
+  --emerald-deeper: #062a1f;
+  --emerald-tint: rgba(23,179,120,0.14);
+
+  --gold: #d7ae5c;
+  --gold-soft: #ecd28f;
+  --gold-line: rgba(215,174,92,0.3);
+
+  --line: rgba(255,255,255,0.08);
+  --line-soft: rgba(255,255,255,0.05);
+  --shadow-sm: 0 6px 18px -10px rgba(0,0,0,.55);
+  --shadow-md: 0 18px 40px -18px rgba(0,0,0,.65);
+  --shadow-lg: 0 30px 60px -24px rgba(0,0,0,.75);
+
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 11px;
+
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html{ scroll-behavior:smooth; }
+body{
+  background:var(--night);
+  color:var(--ink);
+  font-family:'Cairo', sans-serif;
+  min-height:100vh;
+  position:relative;
+}
+h1,h2,h3,h4,.display{ font-family:'Cairo', sans-serif; }
+.quran-font{ font-family:'Cairo', sans-serif; font-weight:500; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; border:none; background:none; cursor:pointer; color:inherit; }
+ul{ list-style:none; }
+img{ max-width:100%; display:block; }
+::selection{ background:var(--gold-soft); color:var(--emerald-deeper); }
+
+body::before{
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    radial-gradient(circle at 15% 6%, rgba(23,179,120,.08), transparent 40%),
+    radial-gradient(circle at 92% 22%, rgba(215,174,92,.06), transparent 42%);
+}
+
+.app-shell{ position:relative; z-index:1; min-width:0; }
+
+/* =========================================================
+   Top App Bar
+   ========================================================= */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  background:linear-gradient(180deg, var(--emerald-deeper), var(--emerald-deep));
+  padding-top:var(--safe-top);
+  box-shadow:0 6px 20px -10px rgba(0,0,0,.6);
+  border-bottom:1px solid rgba(215,174,92,0.12);
+}
+.topbar-inner{
+  max-width:900px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px;
+  gap:10px;
+}
+.tb-brand{ display:flex; align-items:center; gap:9px; min-width:0; }
+.tb-logo{ width:32px; height:32px; border-radius:9px; flex:none; }
+.tb-titles{ line-height:1.15; min-width:0; }
+.tb-titles .name{ font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; color:#fbf4de; }
+.tb-titles .hijri{ font-size:11px; color:var(--gold-soft); }
+.tb-actions{ display:flex; align-items:center; gap:5px; flex:none; }
+.tb-icon-btn{
+  width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+  color:#f3ecd6; background:rgba(255,255,255,.06); transition:background .2s ease;
+}
+.tb-icon-btn:hover{ background:rgba(255,255,255,.14); }
+.tb-icon-btn svg{ width:18px; height:18px; }
+
+.page-head{ max-width:900px; margin:0 auto; padding:16px 16px 4px; }
+.page-head h1{ font-size:20px; font-weight:800; color:var(--ink); }
+.page-head p{ color:var(--ink-soft); font-size:12.5px; margin-top:4px; }
+.back-row{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.back-btn{ display:flex; align-items:center; gap:6px; font-size:13px; color:var(--emerald-bright); font-weight:700; padding:6px 2px; }
+.back-btn svg{ width:16px; height:16px; }
+
+/* =========================================================
+   Layout / pages
+   ========================================================= */
+main.pages{ max-width:900px; margin:0 auto; padding:14px 14px calc(94px + var(--safe-bottom)); }
+.page{ display:none; animation:fadeUp .35s ease; }
+.page.active{ display:block; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
+
+.section-title{ display:flex; align-items:center; justify-content:space-between; margin:22px 0 12px; }
+.section-title h2{ font-size:16px; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:8px; }
+.section-title h2 .ic{ width:18px; height:18px; color:var(--gold); }
+.section-title a.link{ font-size:12px; color:var(--emerald-bright); font-weight:700; }
+
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); }
+
+/* =========================================================
+   HOME
+   ========================================================= */
+.hero-card{
+  background:linear-gradient(150deg, var(--emerald-deeper), var(--emerald-deep));
+  border:1px solid rgba(215,174,92,.14);
+  border-radius:var(--radius-lg);
+  padding:20px 16px;
+  position:relative; overflow:hidden;
+  color:#fbf4de;
+  box-shadow:var(--shadow-md);
+}
+.hero-star-bg{ position:absolute; inset:0; opacity:.08; pointer-events:none; }
+.hero-top-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; position:relative; z-index:1; font-size:12px;}
+.hero-date{ color:var(--gold-soft); }
+.hero-date b{ display:block; font-family:'Cairo',sans-serif; font-size:13px; color:#fff; margin-top:2px; font-weight:700;}
+
+.next-prayer-block{ margin-top:14px; position:relative; z-index:1; text-align:center; }
+.next-prayer-block .label{ font-size:12px; color:var(--gold-soft); letter-spacing:.02em; }
+.next-prayer-block .name{ font-family:'Cairo',sans-serif; font-weight:900; font-size:clamp(24px,7vw,30px); margin:4px 0 2px; }
+.next-prayer-block .time{ font-family:'Cairo',sans-serif; font-size:14px; color:#e9dfc2; }
+.countdown{ display:flex; gap:8px; justify-content:center; margin-top:14px; }
+.countdown .seg{ background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px 11px; min-width:52px; text-align:center; }
+.countdown .seg b{ display:block; font-family:'Cairo',sans-serif; font-size:18px; font-weight:700; }
+.countdown .seg span{ font-size:10px; color:var(--gold-soft); }
+
+.mini-times{ display:grid; grid-template-columns:repeat(6,1fr); gap:5px; margin-top:16px; position:relative; z-index:1; }
+.mini-times .mt{ text-align:center; padding:7px 1px; border-radius:10px; background:rgba(255,255,255,.045); }
+.mini-times .mt.active{ background:var(--gold); color:var(--emerald-deeper); }
+.mini-times .mt span{ display:block; font-size:9px; color:inherit; opacity:.85; }
+.mini-times .mt b{ display:block; font-family:'Cairo',sans-serif; font-size:11px; margin-top:3px; font-weight:700;}
+
+.quick-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px; }
+.quick-item{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px 4px; text-align:center; box-shadow:var(--shadow-sm); transition:transform .2s ease, background .2s ease; }
+.quick-item:active{ transform:scale(.96); background:var(--panel-hover); }
+.quick-item .ic{ width:32px; height:32px; margin:0 auto 7px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--emerald-tint); color:var(--emerald-bright); }
+.quick-item .ic svg{ width:17px; height:17px; }
+.quick-item span{ font-size:11px; font-weight:700; color:var(--ink); }
+
+.hadith-card{ padding:18px; border-top:3px solid var(--gold); }
+.hadith-card .tag{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:.04em; margin-bottom:9px; }
+.hadith-text{ font-family:'Cairo',sans-serif; font-weight:500; font-size:16.5px; line-height:1.95; color:var(--ink); }
+.hadith-meta{ margin-top:11px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;}
+.hadith-meta .src{ font-size:11.5px; color:var(--ink-soft); }
+.hadith-nav{ display:flex; gap:6px; }
+.hadith-nav button{ width:32px; height:32px; border-radius:9px; background:var(--panel-hi); color:var(--emerald-bright); display:flex; align-items:center; justify-content:center; }
+.hadith-nav button svg{ width:15px; height:15px; }
+
+.azkar-quick-row{ display:flex; gap:9px; overflow-x:auto; padding-bottom:4px; margin-top:2px; scrollbar-width:none; }
+.azkar-quick-row::-webkit-scrollbar{ display:none; }
+.azkar-chip{ flex:none; padding:9px 16px; border-radius:999px; background:var(--panel); border:1px solid var(--line); font-size:12.5px; font-weight:700; color:var(--ink); box-shadow:var(--shadow-sm); display:flex; align-items:center; gap:7px; }
+.azkar-chip .count{ background:var(--emerald-tint); color:var(--emerald-bright); font-size:10.5px; font-weight:800; border-radius:999px; padding:1px 7px; }
+
+/* =========================================================
+   Adhan / top alert banner
+   ========================================================= */
+.adhan-banner{
+  position:fixed; top:calc(var(--safe-top) + 8px); left:12px; right:12px; z-index:90;
+  background:linear-gradient(135deg, var(--emerald-deep), var(--emerald-deeper));
+  border:1px solid var(--gold-line); border-radius:16px;
+  padding:14px 16px; box-shadow:0 20px 50px -12px rgba(0,0,0,.7);
+  display:flex; align-items:center; gap:12px;
+  transform:translateY(-140%); transition:transform .4s cubic-bezier(.2,.9,.25,1.1);
+  max-width:640px; margin:0 auto;
+}
+.adhan-banner.show{ transform:translateY(0); }
+.adhan-banner .ic{
+  width:42px; height:42px; border-radius:12px; flex:none; background:rgba(215,174,92,.15);
+  display:flex; align-items:center; justify-content:center; color:var(--gold);
+}
+.adhan-banner .ic svg{ width:22px; height:22px; }
+.adhan-banner .txt{ flex:1; min-width:0; }
+.adhan-banner .txt b{ display:block; font-size:14.5px; color:#fff; font-weight:800; }
+.adhan-banner .txt span{ font-size:11.5px; color:var(--gold-soft); }
+.adhan-banner .close-btn{ width:30px; height:30px; border-radius:9px; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; flex:none; color:#fff; }
+.adhan-banner .close-btn svg{ width:14px; height:14px; }
+.adhan-banner .stop-btn{ font-size:11.5px; font-weight:800; color:var(--gold); background:rgba(215,174,92,.12); padding:7px 12px; border-radius:9px; flex:none; }
+
+/* =========================================================
+   Bottom navigation
+   ========================================================= */
+.bottom-nav{
+  position:fixed; bottom:0; inset-inline:0; z-index:50;
+  background:var(--night-2); border-top:1px solid var(--line);
+  padding:7px 6px calc(7px + var(--safe-bottom));
+  box-shadow:0 -8px 26px -18px rgba(0,0,0,.6);
+}
+.bottom-nav-inner{ max-width:900px; margin:0 auto; display:flex; justify-content:space-around; align-items:center; }
+.nav-btn{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:5px 8px; border-radius:12px; color:var(--ink-faint); min-width:54px; transition:color .2s ease; }
+.nav-btn svg{ width:20px; height:20px; }
+.nav-btn span{ font-size:10px; font-weight:700; }
+.nav-btn.active{ color:var(--emerald-bright); }
+.nav-btn.active .ic-wrap{ background:var(--emerald-tint); }
+.nav-btn .ic-wrap{ padding:5px; border-radius:10px; display:flex; }
+
+/* =========================================================
+   Settings sheet
+   ========================================================= */
+.sheet-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:60; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+.sheet-overlay.open{ opacity:1; pointer-events:auto; }
+.sheet{
+  position:fixed; bottom:0; inset-inline:0; z-index:61;
+  background:var(--night-2); border:1px solid var(--line); border-bottom:none;
+  border-radius:22px 22px 0 0; padding:10px 18px calc(22px + var(--safe-bottom));
+  transform:translateY(100%); transition:transform .3s ease;
+  max-height:82vh; overflow-y:auto;
+  box-shadow:0 -20px 50px -20px rgba(0,0,0,.6);
+}
+.sheet.open{ transform:translateY(0); }
+.sheet-handle{ width:38px; height:4px; background:var(--line); border-radius:99px; margin:8px auto 12px; }
+.sheet h3{ font-size:15.5px; font-weight:800; color:var(--ink); margin-bottom:12px; }
+.settings-row{ display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--line); }
+.settings-row:last-of-type{ border-bottom:none; }
+.settings-row .info{ display:flex; align-items:center; gap:11px; min-width:0; }
+.settings-row .info .ic{ width:36px; height:36px; border-radius:10px; background:var(--emerald-tint); color:var(--emerald-bright); display:flex; align-items:center; justify-content:center; flex:none; }
+.settings-row .info .ic svg{ width:17px; height:17px; }
+.settings-row .txt b{ display:block; font-size:13.5px; font-weight:700; }
+.settings-row .txt span{ font-size:11.5px; color:var(--ink-soft); }
+
+.switch{ position:relative; width:44px; height:25px; flex:none; }
+.switch input{ opacity:0; width:0; height:0; }
+.switch .slider{ position:absolute; inset:0; background:var(--line); border-radius:99px; transition:.25s; }
+.switch .slider::before{ content:''; position:absolute; width:19px; height:19px; border-radius:50%; background:#fff; top:3px; inset-inline-start:3px; transition:.25s; box-shadow:0 2px 5px rgba(0,0,0,.3); }
+.switch input:checked + .slider{ background:var(--emerald); }
+.switch input:checked + .slider::before{ transform:translateX(-19px); }
+
+.install-btn-row{ margin-top:16px; }
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 18px; border-radius:12px; font-weight:800; font-size:13.5px; width:100%; }
+.btn svg{ width:16px; height:16px; }
+.btn-gold{ background:linear-gradient(90deg, var(--gold), #b78a35); color:#241a05; box-shadow:0 10px 24px -10px rgba(215,174,92,.5); }
+.btn-outline{ border:1.5px solid var(--emerald); color:var(--emerald-bright); }
+.btn-block{ margin-top:10px; }
+.reciter-select-btn{ background:var(--panel-hi); border:1px solid var(--line); color:var(--ink); }
+
+/* =========================================================
+   Prayer page
+   ========================================================= */
+.location-bar{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-md); padding:12px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+.location-bar .loc-info{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--ink-soft); min-width:0; }
+.location-bar .loc-info svg{ width:15px; height:15px; color:var(--emerald-bright); flex:none; }
+.location-bar button{ font-size:12px; font-weight:800; color:var(--emerald-bright); white-space:nowrap; }
+
+.prayer-list{ display:flex; flex-direction:column; gap:9px; }
+.prayer-row{ display:flex; align-items:center; justify-content:space-between; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-md); padding:13px 15px; box-shadow:var(--shadow-sm); }
+.prayer-row.active-row{ border-color:var(--gold-line); background:linear-gradient(90deg, rgba(215,174,92,.08), var(--panel)); }
+.prayer-row .p-name{ display:flex; align-items:center; gap:11px; }
+.prayer-row .p-name .ic{ width:36px; height:36px; border-radius:11px; background:var(--emerald-tint); color:var(--emerald-bright); display:flex; align-items:center; justify-content:center; }
+.prayer-row .p-name .ic svg{ width:17px; height:17px; }
+.prayer-row .p-name b{ font-size:13.5px; font-weight:800; }
+.prayer-row .p-time{ font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; color:var(--ink); }
+
+/* =========================================================
+   Quran page
+   ========================================================= */
+.search-box{ display:flex; align-items:center; gap:9px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-md); padding:11px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+.search-box svg{ width:16px; height:16px; color:var(--ink-faint); flex:none; }
+.search-box input{ border:none; outline:none; font-family:inherit; font-size:13.5px; width:100%; background:transparent; color:var(--ink); }
+
+.continue-card{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:linear-gradient(120deg, var(--emerald-deeper), var(--emerald-deep)); color:#fff; border-radius:var(--radius-md); padding:14px 16px; margin-bottom:14px; box-shadow:var(--shadow-md); border:1px solid var(--gold-line); }
+.continue-card .txt span{ display:block; font-size:11px; color:var(--gold-soft); }
+.continue-card .txt b{ font-size:13.5px; }
+.continue-card button{ background:var(--gold); color:var(--emerald-deeper); font-weight:800; font-size:12px; padding:8px 13px; border-radius:9px; white-space:nowrap; }
+
+.reciter-bar{ display:flex; align-items:center; gap:8px; overflow-x:auto; margin-bottom:14px; scrollbar-width:none; }
+.reciter-bar::-webkit-scrollbar{ display:none; }
+.reciter-chip{ flex:none; display:flex; align-items:center; gap:6px; padding:9px 14px; border-radius:999px; background:var(--panel); border:1px solid var(--line); font-size:12px; font-weight:700; color:var(--ink-soft); }
+.reciter-chip.active{ background:var(--emerald); color:#04140d; border-color:var(--emerald); }
+
+.surah-list{ display:flex; flex-direction:column; gap:7px; }
+.surah-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:11px 14px; }
+.surah-row .left{ display:flex; align-items:center; gap:11px; min-width:0; }
+.surah-num{ width:32px; height:32px; border-radius:9px; flex:none; background:var(--panel-hi); color:var(--gold); font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; display:flex; align-items:center; justify-content:center; }
+.surah-names{ min-width:0; }
+.surah-names b{ display:block; font-size:13.5px; font-weight:800; }
+.surah-names span{ font-size:11px; color:var(--ink-soft); }
+.surah-row .ar-name{ font-family:'Cairo',sans-serif; font-weight:700; font-size:17px; color:var(--gold); flex:none; }
+
+/* mushaf page reader */
+.mushaf-frame{
+  background:radial-gradient(circle at 30% 0%, rgba(23,179,120,.05), transparent 55%), var(--panel);
+  border:1px solid var(--line); border-radius:var(--radius-lg);
+  padding:18px 16px 14px; position:relative; overflow:hidden; min-height:340px;
+}
+.mushaf-topline{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:8px; }
+.mushaf-surah-badge{ font-size:12px; font-weight:800; color:var(--gold); background:rgba(215,174,92,.1); padding:5px 12px; border-radius:999px; white-space:nowrap; }
+.mushaf-page-num{ font-family:'Cairo',sans-serif; font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+.mushaf-bismillah{ text-align:center; font-family:'Cairo',sans-serif; font-weight:700; font-size:19px; color:var(--gold); margin:6px 0 14px; }
+.mushaf-text{ font-family:'Cairo',sans-serif; font-weight:500; font-size:21px; line-height:2.35; color:var(--ink); text-align:justify; }
+.mushaf-text .ayah-span{ border-radius:6px; padding:1px 2px; transition:background .3s ease; }
+.mushaf-text .ayah-span.playing{ background:var(--emerald-tint); }
+.ayah-num{ display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border:1.5px solid var(--gold); border-radius:50%; font-family:'Cairo',sans-serif; font-size:10.5px; color:var(--gold); margin:0 3px; vertical-align:middle; }
+
+.mushaf-nav-row{ display:flex; align-items:center; gap:10px; margin-top:14px; }
+.mushaf-nav-btn{ flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border-radius:12px; background:var(--panel-hi); border:1px solid var(--line); font-size:12.5px; font-weight:700; color:var(--ink); }
+.mushaf-nav-btn svg{ width:15px; height:15px; }
+.mushaf-nav-btn:disabled{ opacity:.35; }
+.mushaf-jump{ text-align:center; margin-top:10px; font-size:11.5px; color:var(--ink-faint); }
+
+.audio-bar{
+  position:sticky; bottom:calc(64px + var(--safe-bottom)); z-index:15;
+  display:flex; align-items:center; gap:10px;
+  background:var(--panel-hi); border:1px solid var(--gold-line); border-radius:14px;
+  padding:10px 12px; margin-top:14px; box-shadow:var(--shadow-md);
+}
+.audio-bar .play-btn{ width:38px; height:38px; border-radius:50%; background:var(--gold); color:var(--emerald-deeper); display:flex; align-items:center; justify-content:center; flex:none; }
+.audio-bar .play-btn svg{ width:16px; height:16px; }
+.audio-bar .meta{ flex:1; min-width:0; }
+.audio-bar .meta b{ display:block; font-size:12px; font-weight:700; color:var(--ink); }
+.audio-bar .meta span{ font-size:10.5px; color:var(--ink-soft); }
+.audio-bar .stop-btn{ width:32px; height:32px; border-radius:9px; background:rgba(255,255,255,.06); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; flex:none; }
+.audio-bar .stop-btn svg{ width:14px; height:14px; }
+
+/* =========================================================
+   Tasbih page
+   ========================================================= */
+.tasbih-wrap{ text-align:center; }
+.tasbih-target-select{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:20px; scrollbar-width:none; }
+.tasbih-target-select::-webkit-scrollbar{ display:none; }
+.dhikr-chip{ flex:none; padding:10px 16px; border-radius:999px; border:1.5px solid var(--line); background:var(--panel); font-family:'Cairo',sans-serif; font-weight:600; font-size:14.5px; color:var(--ink); }
+.dhikr-chip.active{ border-color:var(--emerald); background:var(--emerald); color:#04140d; }
+
+.tasbih-ring{
+  width:min(72vw, 260px); height:min(72vw,260px); margin:0 auto 20px; border-radius:50%;
+  background:radial-gradient(circle at 32% 28%, #0f8f63, var(--emerald-deeper) 72%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.65), inset 0 0 0 9px rgba(255,255,255,.05);
+  position:relative; user-select:none; -webkit-user-select:none;
+  border:3px solid var(--gold-line);
+  transition:transform .12s ease;
+}
+.tasbih-ring:active{ transform:scale(.97); }
+.tasbih-ring .count{ font-family:'Cairo',sans-serif; font-weight:900; font-size:50px; color:#fff; }
+.tasbih-ring .dhikr-current{ font-family:'Cairo',sans-serif; font-weight:700; font-size:16px; color:var(--gold-soft); margin-top:6px; }
+.tasbih-ring .tap-hint{ font-size:10px; color:rgba(255,255,255,.45); margin-top:9px; }
+
+.tasbih-actions{ display:flex; gap:12px; justify-content:center; }
+.tasbih-actions button{ display:flex; flex-direction:column; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--ink-soft); }
+.tasbih-actions .circ{ width:48px; height:48px; border-radius:50%; background:var(--panel); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm); }
+.tasbih-actions .circ svg{ width:19px; height:19px; color:var(--emerald-bright); }
+
+.tasbih-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:24px; }
+.tasbih-stats .st{ background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:13px 5px; }
+.tasbih-stats .st b{ display:block; font-family:'Cairo',sans-serif; font-size:18px; color:var(--ink); font-weight:800; }
+.tasbih-stats .st span{ font-size:10.5px; color:var(--ink-soft); }
+
+/* =========================================================
+   Azkar page
+   ========================================================= */
+.azkar-tabs{ display:flex; gap:7px; overflow-x:auto; margin-bottom:14px; scrollbar-width:none; }
+.azkar-tabs::-webkit-scrollbar{ display:none; }
+.azkar-tab{ flex:none; padding:10px 17px; border-radius:999px; background:var(--panel); border:1px solid var(--line); font-size:12.5px; font-weight:800; color:var(--ink-soft); display:flex; align-items:center; gap:7px; }
+.azkar-tab.active{ background:var(--emerald); color:#04140d; border-color:var(--emerald); }
+
+.azkar-progress{ display:flex; align-items:center; gap:10px; margin-bottom:14px; font-size:11.5px; color:var(--ink-soft); }
+.azkar-progress .bar{ flex:1; height:6px; border-radius:99px; background:var(--panel-hi); overflow:hidden; }
+.azkar-progress .bar i{ display:block; height:100%; background:linear-gradient(90deg, var(--gold), var(--emerald)); width:0%; transition:width .3s ease; }
+
+.zikr-card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:18px; margin-bottom:12px; box-shadow:var(--shadow-sm); transition:opacity .25s ease; }
+.zikr-card.done{ opacity:.45; }
+.zikr-text{ font-family:'Cairo',sans-serif; font-weight:500; font-size:17px; line-height:2.05; color:var(--ink); text-align:justify; }
+.zikr-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:12px; gap:8px; }
+.zikr-source{ font-size:11px; color:var(--ink-soft); }
+.zikr-counter{ display:flex; align-items:center; gap:9px; flex:none; }
+.zikr-counter .num{ font-family:'Cairo',sans-serif; font-weight:800; font-size:12.5px; color:var(--emerald-bright); min-width:30px; text-align:center; }
+.zikr-counter button{ width:32px; height:32px; border-radius:9px; background:var(--emerald-tint); color:var(--emerald-bright); display:flex; align-items:center; justify-content:center; }
+.zikr-counter button svg{ width:14px; height:14px; }
+
+/* =========================================================
+   Toast
+   ========================================================= */
+.toast{
+  position:fixed; bottom:calc(94px + var(--safe-bottom)); left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--panel-hi); border:1px solid var(--line); color:#fff; padding:11px 20px; border-radius:99px; font-size:12.5px;
+  z-index:80; opacity:0; pointer-events:none; transition:.3s ease; box-shadow:var(--shadow-lg);
+  white-space:nowrap; max-width:90vw; overflow:hidden; text-overflow:ellipsis;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+.state-msg{ text-align:center; padding:36px 16px; color:var(--ink-soft); font-size:13px; }
+.state-msg .spin{ width:28px; height:28px; border:3px solid var(--panel-hi); border-top-color:var(--emerald-bright); border-radius:50%; margin:0 auto 12px; animation:spin 1s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+@media(min-width:760px){
+  .bottom-nav{ display:none; }
+  main.pages{ padding-bottom:50px; }
+  .desktop-nav{ display:flex !important; }
+}
+.desktop-nav{ display:none; max-width:900px; margin:0 auto; gap:6px; padding:0 16px 12px; }
+.desktop-nav .nav-btn{ flex-direction:row; color:#d8e6de; }
+.desktop-nav .nav-btn span{ color:inherit; }
+.desktop-nav .nav-btn.active{ background:rgba(255,255,255,.1); color:#fff; }
+.desktop-nav .nav-btn.active .ic-wrap{ background:transparent; }
+.desktop-nav .nav-btn svg{ color:inherit; }
+
+/* base mobile-first tightening (applies to all phones) */
+@media(max-width:480px){
+  main.pages{ padding-left:12px; padding-right:12px; }
+  .topbar-inner{ padding:10px 12px; }
+  .tb-titles .name{ font-size:15px; }
+  .hero-card{ padding:16px 13px; border-radius:18px; }
+  .next-prayer-block .name{ font-size:24px; }
+  .countdown{ gap:6px; }
+  .countdown .seg{ min-width:46px; padding:7px 6px; }
+  .countdown .seg b{ font-size:16px; }
+  .mini-times{ gap:4px; }
+  .mini-times .mt b{ font-size:10px; }
+  .quick-grid{ gap:7px; }
+  .quick-item{ padding:10px 3px; }
+  .quick-item span{ font-size:10px; }
+  .hadith-text{ font-size:15px; line-height:1.9; }
+  .section-title h2{ font-size:14.5px; }
+  .mushaf-text{ font-size:18px; line-height:2.15; }
+  .mushaf-frame{ padding:14px 12px 12px; min-height:280px; }
+  .tasbih-ring{ width:64vw; height:64vw; }
+  .tasbih-ring .count{ font-size:42px; }
+  .zikr-text{ font-size:15.5px; line-height:1.95; }
+  .prayer-row{ padding:11px 12px; }
+  .surah-row{ padding:10px 12px; }
+  .btn{ font-size:13px; padding:11px 16px; }
+}
+
+@media(max-width:360px){
+  .mini-times{ grid-template-columns:repeat(3,1fr); row-gap:6px; }
+  .mushaf-text{ font-size:16.5px; }
+  .tasbih-ring .count{ font-size:38px; }
+  .countdown .seg{ min-width:40px; }
+}
+
+@media print{
+  .topbar, .bottom-nav{ display:none; }
+}

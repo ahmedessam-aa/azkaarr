@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>أذكار — رفيقك اليومي في القرآن والأذكار ومواقيت الصلاة</title>
+<meta name="description" content="تطبيق أذكار: مواقيت الصلاة، القرآن الكريم كاملاً، السبحة الإلكترونية، الأذكار اليومية، وأحاديث نبوية مختارة.">
+<meta name="theme-color" content="#062a1f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="adhan-banner" id="adhanBanner">
+    <span class="ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </span>
+    <div class="txt">
+      <b id="adhanBannerTitle">حان الآن وقت الصلاة</b>
+      <span id="adhanBannerSub">حي على الصلاة، حي على الفلاح</span>
+    </div>
+    <button class="stop-btn" id="adhanStopBtn">إيقاف الصوت</button>
+    <button class="close-btn" id="adhanCloseBtn" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- ============ TOP APP BAR ============ -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="tb-brand">
+        <img src="icon-192.png" class="tb-logo" alt="أذكار">
+        <div class="tb-titles">
+          <div class="name">أذكار</div>
+          <div class="hijri" id="hijriDate">...</div>
+        </div>
+      </div>
+      <div class="tb-actions">
+        <button class="tb-icon-btn" id="notifBtn" aria-label="الإشعارات">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </button>
+        <button class="tb-icon-btn" id="settingsBtn" aria-label="الإعدادات">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.23.5.63.9 1.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ DESKTOP NAV ============ -->
+  <nav class="desktop-nav" id="desktopNav"></nav>
+
+  <main class="pages">
+
+    <!-- ============ HOME ============ -->
+    <section class="page active" id="page-home">
+
+      <div class="hero-card">
+        <svg class="hero-star-bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="#e7c67a" stroke-width="1">
+            <polygon points="100,10 130,70 190,70 145,110 160,175 100,140 40,175 55,110 10,70 70,70"/>
+          </g>
+        </svg>
+        <div class="hero-top-row">
+          <div class="hero-date">
+            التاريخ اليوم
+            <b id="gregDate">—</b>
+          </div>
+          <div class="hero-date" style="text-align:left;">
+            الموقع
+            <b id="locLabel">جارِ التحديد…</b>
+          </div>
+        </div>
+
+        <div class="next-prayer-block">
+          <div class="label">الصلاة القادمة</div>
+          <div class="name" id="nextPrayerName">—</div>
+          <div class="time" id="nextPrayerTime">--:--</div>
+          <div class="countdown" id="countdown">
+            <div class="seg"><b id="cdH">00</b><span>ساعة</span></div>
+            <div class="seg"><b id="cdM">00</b><span>دقيقة</span></div>
+            <div class="seg"><b id="cdS">00</b><span>ثانية</span></div>
+          </div>
+        </div>
+
+        <div class="mini-times" id="miniTimes">
+          <div class="mt" data-p="Fajr"><span>الفجر</span><b>--:--</b></div>
+          <div class="mt" data-p="Sunrise"><span>الشروق</span><b>--:--</b></div>
+          <div class="mt" data-p="Dhuhr"><span>الظهر</span><b>--:--</b></div>
+          <div class="mt" data-p="Asr"><span>العصر</span><b>--:--</b></div>
+          <div class="mt" data-p="Maghrib"><span>المغرب</span><b>--:--</b></div>
+          <div class="mt" data-p="Isha"><span>العشاء</span><b>--:--</b></div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <h2>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.25C10.5 4.5 8 3.75 5.5 4c-1 3 0 8 6.5 12 6.5-4 7.5-9 6.5-12-2.5-.25-5 .5-6.5 2.25z"/></svg>
+          وصول سريع
+        </h2>
+      </div>
+      <div class="quick-grid">
+        <button class="quick-item" data-nav="quran">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.3-4-2-6.5-1.7v13c2.5-.3 4.9.4 6.5 1.7 1.6-1.3 4-2 6.5-1.7v-13c-2.5-.3-4.9.4-6.5 1.7z"/><line x1="12" y1="6.5" x2="12" y2="19.5"/></svg></div>
+          <span>القرآن</span>
+        </button>
+        <button class="quick-item" data-nav="prayer">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 3.2"/></svg></div>
+          <span>الصلاة</span>
+        </button>
+        <button class="quick-item" data-nav="tasbih">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="4.5" cy="8" r="1.7"/><circle cx="4.5" cy="16" r="1.7"/><circle cx="19.5" cy="8" r="1.7"/><circle cx="19.5" cy="16" r="1.7"/><circle cx="12" cy="3.2" r="1.7"/></svg></div>
+          <span>السبحة</span>
+        </button>
+        <button class="quick-item" data-nav="azkar">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c-2-1-4-3.5-4-7 0-5 5-7 5-11 3 1 6 4 6 8 0 1.5-.5 2.5-1 3.5 1.6-.4 3-1.5 4-3 1 1.5 1.5 3 1.5 4.5 0 3.5-2.5 6-6 7"/></svg></div>
+          <span>الأذكار</span>
+        </button>
+      </div>
+
+      <div class="section-title">
+        <h2>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          حديث اليوم
+        </h2>
+        <a class="link" data-nav="hadith">كل الأحاديث</a>
+      </div>
+      <div class="card hadith-card" id="homeHadithCard">
+        <span class="tag">حديث شريف</span>
+        <p class="hadith-text" id="homeHadithText">—</p>
+        <div class="hadith-meta">
+          <span class="src" id="homeHadithSrc">—</span>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <h2>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c-2-1-4-3.5-4-7 0-5 5-7 5-11 3 1 6 4 6 8 0 1.5-.5 2.5-1 3.5 1.6-.4 3-1.5 4-3 1 1.5 1.5 3 1.5 4.5 0 3.5-2.5 6-6 7"/></svg>
+          أذكار سريعة
+        </h2>
+      </div>
+      <div class="azkar-quick-row" id="homeAzkarChips"></div>
+
+    </section>
+
+    <!-- ============ QURAN ============ -->
+    <section class="page" id="page-quran">
+      <div id="quranListView">
+        <div class="page-head" style="padding:0 0 4px;">
+          <h1>القرآن الكريم</h1>
+          <p>114 سورة — بشكل صفحات المصحف</p>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="surahSearch" placeholder="ابحث عن سورة بالاسم أو الرقم…">
+        </div>
+        <div class="continue-card" id="continueCard" style="display:none;">
+          <div class="txt">
+            <span>متابعة القراءة</span>
+            <b id="continueLabel">—</b>
+          </div>
+          <button id="continueBtn">متابعة</button>
+        </div>
+        <div class="surah-list" id="surahList">
+          <div class="state-msg"><div class="spin"></div>جارِ تحميل قائمة السور…</div>
+        </div>
+      </div>
+
+      <div id="quranReaderView" style="display:none;">
+        <div class="back-row">
+          <button class="back-btn" id="quranBackBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            رجوع لقائمة السور
+          </button>
+        </div>
+
+        <div class="reciter-bar" id="reciterBar"></div>
+
+        <div class="mushaf-frame">
+          <div class="mushaf-topline">
+            <span class="mushaf-surah-badge" id="mushafSurahBadge">—</span>
+            <span class="mushaf-page-num" id="mushafPageNum">صفحة — / 604</span>
+          </div>
+          <div class="mushaf-bismillah" id="mushafBismillah"></div>
+          <div id="mushafText" class="mushaf-text">
+            <div class="state-msg"><div class="spin"></div>جارِ تحميل الصفحة…</div>
+          </div>
+        </div>
+
+        <div class="audio-bar" id="audioBar" style="display:none;">
+          <button class="play-btn" id="audioPlayBtn">
+            <svg id="audioPlayIcon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
+          </button>
+          <div class="meta">
+            <b id="audioMetaTitle">استماع للصفحة</b>
+            <span id="audioMetaSub">بصوت —</span>
+          </div>
+          <button class="stop-btn" id="audioStopBtn" aria-label="إيقاف">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+          </button>
+        </div>
+
+        <div class="mushaf-nav-row">
+          <button class="mushaf-nav-btn" id="nextPageBtn">الصفحة التالية <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button class="mushaf-nav-btn" id="prevPageBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg> الصفحة السابقة</button>
+        </div>
+        <p class="mushaf-jump">اسحب يمينًا أو يسارًا للتنقل بين الصفحات</p>
+      </div>
+    </section>
+
+    <!-- ============ PRAYER TIMES ============ -->
+    <section class="page" id="page-prayer">
+      <div class="page-head" style="padding:0 0 4px;">
+        <h1>مواقيت الصلاة</h1>
+        <p id="prayerDateLabel">—</p>
+      </div>
+      <div class="location-bar">
+        <div class="loc-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="prayerLocLabel">جارِ تحديد الموقع…</span>
+        </div>
+        <button id="refreshLocBtn">تحديث</button>
+      </div>
+      <div class="prayer-list" id="prayerList">
+        <div class="state-msg"><div class="spin"></div>جارِ حساب المواقيت…</div>
+      </div>
+    </section>
+
+    <!-- ============ TASBIH ============ -->
+    <section class="page" id="page-tasbih">
+      <div class="page-head" style="padding:0 0 4px;">
+        <h1>السبحة الإلكترونية</h1>
+        <p>اضغط على الدائرة للتسبيح</p>
+      </div>
+      <div class="tasbih-wrap">
+        <div class="tasbih-target-select" id="dhikrChips">
+          <button class="dhikr-chip active" data-dhikr="سبحان الله">سبحان الله</button>
+          <button class="dhikr-chip" data-dhikr="الحمد لله">الحمد لله</button>
+          <button class="dhikr-chip" data-dhikr="الله أكبر">الله أكبر</button>
+          <button class="dhikr-chip" data-dhikr="أستغفر الله">أستغفر الله</button>
+        </div>
+
+        <div class="tasbih-ring" id="tasbihRing">
+          <div class="count" id="tasbihCount">0</div>
+          <div class="dhikr-current" id="tasbihCurrentDhikr">سبحان الله</div>
+          <div class="tap-hint">اضغط للعد</div>
+        </div>
+
+        <div class="tasbih-actions">
+          <button id="tasbihResetBtn">
+            <span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></span>
+            تصفير
+          </button>
+          <button id="tasbihVibrateBtn">
+            <span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16M16 4v16M4 8v8M20 8v8"/></svg></span>
+            <span id="vibrateLabel">الاهتزاز: تشغيل</span>
+          </button>
+        </div>
+
+        <div class="tasbih-stats">
+          <div class="st"><b id="statToday">0</b><span>اليوم</span></div>
+          <div class="st"><b id="statTotal">0</b><span>الإجمالي</span></div>
+          <div class="st"><b id="statSessions">0</b><span>الجلسات</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ AZKAR ============ -->
+    <section class="page" id="page-azkar">
+      <div class="page-head" style="padding:0 0 4px;">
+        <h1>الأذكار</h1>
+        <p>اضغط على أي ذكر لعدّ التكرار</p>
+      </div>
+      <div class="azkar-tabs" id="azkarTabs">
+        <button class="azkar-tab active" data-cat="morning">☀️ الصباح</button>
+        <button class="azkar-tab" data-cat="evening">🌙 المساء</button>
+        <button class="azkar-tab" data-cat="sleep">⭐ النوم</button>
+        <button class="azkar-tab" data-cat="afterPrayer">🤲 بعد الصلاة</button>
+      </div>
+      <div class="azkar-progress">
+        <span id="azkarProgressLabel">0 / 0</span>
+        <div class="bar"><i id="azkarProgressBar"></i></div>
+        <button id="azkarResetBtn" style="font-weight:800;color:var(--emerald);white-space:nowrap;">إعادة</button>
+      </div>
+      <div id="azkarList"></div>
+    </section>
+
+    <!-- ============ HADITH ============ -->
+    <section class="page" id="page-hadith">
+      <div class="page-head" style="padding:0 0 4px;">
+        <h1>الأحاديث النبوية</h1>
+        <p id="hadithCounter">—</p>
+      </div>
+      <div class="card hadith-card">
+        <span class="tag">حديث شريف</span>
+        <p class="hadith-text" id="hadithPageText">—</p>
+        <div class="hadith-meta">
+          <span class="src" id="hadithPageMeta">—</span>
+          <div class="hadith-nav">
+            <button id="hadithPrevBtn" aria-label="السابق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button id="hadithNextBtn" aria-label="التالي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-block" id="hadithRandomBtn">حديث عشوائي</button>
+    </section>
+
+  </main>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner" id="bottomNav"></div>
+  </nav>
+
+  <!-- ============ SETTINGS SHEET ============ -->
+  <div class="sheet-overlay" id="sheetOverlay"></div>
+  <div class="sheet" id="settingsSheet">
+    <div class="sheet-handle"></div>
+    <h3>الإعدادات والإشعارات</h3>
+
+    <div class="settings-row">
+      <div class="info">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 3.2"/></svg></span>
+        <div class="txt"><b>تنبيه مواقيت الصلاة</b><span>إشعار عند دخول كل وقت صلاة</span></div>
+      </div>
+      <label class="switch"><input type="checkbox" id="togglerPrayerNotif"><span class="slider"></span></label>
+    </div>
+
+    <div class="settings-row">
+      <div class="info">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c-2-1-4-3.5-4-7 0-5 5-7 5-11 3 1 6 4 6 8 0 1.5-.5 2.5-1 3.5 1.6-.4 3-1.5 4-3 1 1.5 1.5 3 1.5 4.5 0 3.5-2.5 6-6 7"/></svg></span>
+        <div class="txt"><b>تذكير الأذكار</b><span>تذكير بأذكار الصباح والمساء</span></div>
+      </div>
+      <label class="switch"><input type="checkbox" id="toggleAzkarNotif"><span class="slider"></span></label>
+    </div>
+
+    <div class="settings-row">
+      <div class="info">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
+        <div class="txt"><b>حديث يومي</b><span>إشعار يومي بحديث مختار</span></div>
+      </div>
+      <label class="switch"><input type="checkbox" id="toggleHadithNotif"><span class="slider"></span></label>
+    </div>
+
+    <div class="settings-row">
+      <div class="info">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6c-1.5-1.5-4-1.5-5.5 0L12 7.9 8.7 4.6c-1.5-1.5-4-1.5-5.5 0-1.5 1.5-1.5 4 0 5.5L12 18.7l8.8-8.6c1.5-1.5 1.5-4 0-5.5z"/></svg></span>
+        <div class="txt"><b>تذكير الصلاة على النبي ﷺ</b><span>تنبيه صوتي كل نصف ساعة</span></div>
+      </div>
+      <label class="switch"><input type="checkbox" id="toggleSalawatNotif"><span class="slider"></span></label>
+    </div>
+
+    <div class="settings-row">
+      <div class="info">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16M16 4v16M4 8v8M20 8v8"/></svg></span>
+        <div class="txt"><b>اهتزاز السبحة</b><span>اهتزاز خفيف عند كل تسبيحة (موبايل)</span></div>
+      </div>
+      <label class="switch"><input type="checkbox" id="toggleVibrate" checked><span class="slider"></span></label>
+    </div>
+
+    <div class="install-btn-row">
+      <button class="btn btn-gold" id="installBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        تحميل تطبيق أذكار
+      </button>
+      <p id="installHint" style="font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:10px;">ثبّت التطبيق على شاشتك الرئيسية ليعمل مثل أي تطبيق آخر</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="data-azkar.js"></script>
+<script src="data-hadith.js"></script>
+<script src="prayer.js"></script>
+<script src="quran.js"></script>
+<script src="tasbih.js"></script>
+<script src="azkar.js"></script>
+<script src="notifications.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
