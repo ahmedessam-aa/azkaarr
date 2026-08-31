@@ -46,6 +46,7 @@ function navigateTo(pageId){
   if(pageId === 'prophets' && window.ProphetsModule) ProphetsModule.onEnter();
   if(pageId === 'seerah' && window.SeerahModule) SeerahModule.onEnter();
   if(pageId === 'fatwa' && window.FatwaModule) FatwaModule.onEnter();
+  if(pageId === 'hifz' && window.HifzModule) HifzModule.onEnter();
 }
 
 document.addEventListener('click', (e)=>{
@@ -53,6 +54,12 @@ document.addEventListener('click', (e)=>{
   if(navEl){
     e.preventDefault();
     navigateTo(navEl.dataset.nav);
+    return;
+  }
+  const hifzEl = e.target.closest('[data-hifz-mode]');
+  if(hifzEl && window.HifzModule){
+    e.preventDefault();
+    HifzModule.openWithMode(hifzEl.dataset.hifzMode);
   }
 });
 

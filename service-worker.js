@@ -1,4 +1,4 @@
-const CACHE_NAME = 'azkar-app-v5';
+const CACHE_NAME = 'azkar-app-v7';
 const APP_SHELL = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const APP_SHELL = [
   './tasbih.js',
   './azkar.js',
   './tafsir.js',
+  './hifz.js',
   './content-pages.js',
   './notifications.js',
   './data-azkar.js',

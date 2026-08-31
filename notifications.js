@@ -3,7 +3,7 @@
 /*
   ملاحظة هامة وصادقة عن حدود المتصفح:
   الإشعارات والأصوات هنا (الأذان، تذكير الصلاة على النبي) تعمل فعليًا
-  عبر ملفات صوتية محلية (sounds/adhan.mp3 و sounds/salawat.mp3) بينما
+  عبر ملفات صوتية محلية (adhan.mp3 و salawat.mp3) بينما
   التطبيق مفتوح أو في الخلفية القريبة (تبديل تطبيقات بدون إغلاقه فعليًا).
 
   هذا حد تقني في منصة الويب نفسها وليس قصورًا في الكود: عندما يُغلق
@@ -15,8 +15,8 @@
   الخلفية (لا تُغلقه بالكامل) ليستمر سماع الأذان والتذكيرات.
 */
 
-const ADHAN_AUDIO_URL = 'sounds/adhan.mp3';
-const SALAWAT_AUDIO_URL = 'sounds/salawat.mp3';
+const ADHAN_AUDIO_URL = 'adhan.mp3';
+const SALAWAT_AUDIO_URL = 'salawat.mp3';
 
 const NotificationsModule = (()=>{
   let checkInterval = null;
@@ -43,11 +43,11 @@ const NotificationsModule = (()=>{
       if('serviceWorker' in navigator){
         const reg = await navigator.serviceWorker.getRegistration();
         if(reg){
-          reg.showNotification(title, { body, icon:'icons/icon-192.png', badge:'icons/icon-192.png', tag, dir:'rtl', lang:'ar' });
+          reg.showNotification(title, { body, icon:'icon-192.png', badge:'icon-192.png', tag, dir:'rtl', lang:'ar' });
           return;
         }
       }
-      new Notification(title, { body, icon:'icons/icon-192.png', dir:'rtl', lang:'ar' });
+      new Notification(title, { body, icon:'icon-192.png', dir:'rtl', lang:'ar' });
     }catch(e){ /* silent */ }
   }
 

@@ -154,6 +154,14 @@
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 17v.01M12 14c0-2.5 2.5-2 2.5-4.5A2.5 2.5 0 0012 7a2.5 2.5 0 00-2.5 2.5"/></svg></div>
           <span>دليل الفتوى</span>
         </button>
+        <button class="quick-item" data-hifz-mode="reading">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.3-4-2-6.5-1.7v13c2.5-.3 4.9.4 6.5 1.7 1.6-1.3 4-2 6.5-1.7v-13c-2.5-.3-4.9.4-6.5 1.7z"/><line x1="12" y1="6.5" x2="12" y2="19.5"/></svg></div>
+          <span>اختبار القراءة</span>
+        </button>
+        <button class="quick-item" data-hifz-mode="memorization">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg></div>
+          <span>اختبار الحفظ</span>
+        </button>
       </div>
 
       <div class="section-title">
@@ -414,6 +422,47 @@
       <div id="fatwaList"></div>
     </section>
 
+    <!-- ============ اختبار القراءة / اختبار الحفظ ============ -->
+    <section class="page" id="page-hifz">
+      <div id="hifzPickerView">
+        <div class="page-head" style="padding:0 0 4px;">
+          <h1 id="hifzModeTitle">اختبار القراءة</h1>
+          <p id="hifzModeDesc">الآيات ظاهرة قدامك — اقرأها بصوتك وهيتصحح نطقك</p>
+        </div>
+        <div class="hifz-mode-tabs">
+          <button class="hifz-mode-tab active" data-mode="reading">📖 اختبار القراءة</button>
+          <button class="hifz-mode-tab" data-mode="memorization">🧠 اختبار الحفظ</button>
+        </div>
+        <div class="card" id="hifzUnsupportedNote" style="display:none; padding:14px 16px; margin-bottom:14px; border-right:3px solid var(--gold);">
+          <p style="font-size:12.5px; color:var(--ink-soft); line-height:1.8;">
+            التعرف الصوتي غير مدعوم في هذا المتصفح. للحصول على أفضل تجربة، افتح
+            التطبيق من متصفح Chrome (على الكمبيوتر أو الأندرويد).
+          </p>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="hifzSearch" placeholder="ابحث عن سورة بالاسم أو الرقم…">
+        </div>
+        <div class="surah-list" id="hifzSurahPicker">
+          <div class="state-msg"><div class="spin"></div>جارِ تحميل قائمة السور…</div>
+        </div>
+      </div>
+
+      <div id="hifzTestView" style="display:none;">
+        <div class="back-row">
+          <button class="back-btn" id="hifzBackBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            رجوع لاختيار سورة أخرى
+          </button>
+        </div>
+        <div class="page-head" style="padding:0 0 4px;">
+          <h1 id="hifzSurahTitle">—</h1>
+          <p id="hifzProgressSummary">—</p>
+        </div>
+        <div id="hifzAyahList"></div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ============ BOTTOM NAV ============ -->
@@ -504,6 +553,7 @@
 <script src="tasbih.js"></script>
 <script src="azkar.js"></script>
 <script src="tafsir.js"></script>
+<script src="hifz.js"></script>
 <script src="content-pages.js"></script>
 <script src="notifications.js"></script>
 <script src="app.js"></script>
