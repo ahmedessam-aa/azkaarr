@@ -168,9 +168,17 @@ const QuranModule = (()=>{
             html += `<div class="mushaf-bismillah" style="margin:6px 0 12px;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`;
           }
         }
-        html += `<span class="ayah-span" data-idx="${idx}">${a.text} <span class="ayah-num">${a.numberInSurah}</span></span> `;
+        html += `<span class="ayah-span" data-idx="${idx}">${a.text} <span class="ayah-num" data-surah="${a.surah.number}" data-ayah="${a.numberInSurah}" data-surah-name="${a.surah.name}" title="اضغط لعرض التفسير">${a.numberInSurah}</span></span> `;
       });
       textEl.innerHTML = html;
+      textEl.querySelectorAll('.ayah-num').forEach(el=>{
+        el.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          if(window.TafsirModule){
+            TafsirModule.open(parseInt(el.dataset.surah,10), parseInt(el.dataset.ayah,10), el.dataset.surahName);
+          }
+        });
+      });
 
       document.getElementById('audioBar').style.display = 'flex';
       updateAudioMeta();

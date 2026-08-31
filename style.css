@@ -35,6 +35,34 @@
   --safe-top: env(safe-area-inset-top, 0px);
 }
 
+/* Light mode overrides — toggled via html[data-theme="light"] */
+html[data-theme="light"]{
+  --night: #faf6ec;
+  --night-2: #f2ead8;
+  --panel: #ffffff;
+  --panel-hi: #f5efe0;
+  --panel-hover: #efe6d0;
+  --ink: #1f2a24;
+  --ink-soft: #5b665d;
+  --ink-faint: #8a9187;
+
+  --emerald: #0b6e4f;
+  --emerald-bright: #0a7a57;
+  --emerald-deep: #0b6e4f;
+  --emerald-deeper: #064a35;
+  --emerald-tint: rgba(11,110,79,0.08);
+
+  --gold: #b8862c;
+  --gold-soft: #a9791f;
+  --gold-line: rgba(184,134,44,0.28);
+
+  --line: rgba(11,110,79,0.14);
+  --line-soft: rgba(11,110,79,0.07);
+  --shadow-sm: 0 6px 18px -10px rgba(6,40,28,.16);
+  --shadow-md: 0 18px 40px -18px rgba(6,40,28,.22);
+  --shadow-lg: 0 30px 60px -24px rgba(6,40,28,.3);
+}
+
 *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 html{ scroll-behavior:smooth; }
 body{
@@ -145,7 +173,7 @@ main.pages{ max-width:900px; margin:0 auto; padding:14px 14px calc(94px + var(--
 .mini-times .mt span{ display:block; font-size:10px; color:inherit; opacity:.85; }
 .mini-times .mt b{ display:block; font-family:'Cairo',sans-serif; font-size:12px; margin-top:3px; font-weight:700;}
 
-.quick-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-top:16px; }
+.quick-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:16px; }
 .quick-item{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px 4px; text-align:center; box-shadow:var(--shadow-sm); transition:transform .2s ease, background .2s ease; }
 .quick-item:active{ transform:scale(.96); background:var(--panel-hover); }
 .quick-item .ic{ width:32px; height:32px; margin:0 auto 7px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--emerald-tint); color:var(--emerald-bright); }
@@ -387,7 +415,7 @@ main.pages{ max-width:900px; margin:0 auto; padding:14px 14px calc(94px + var(--
    ========================================================= */
 .toast{
   position:fixed; bottom:calc(94px + var(--safe-bottom)); left:50%; transform:translateX(-50%) translateY(20px);
-  background:var(--panel-hi); border:1px solid var(--line); color:#fff; padding:11px 20px; border-radius:99px; font-size:14px;
+  background:#182019; border:1px solid rgba(215,174,92,.25); color:#fff; padding:11px 20px; border-radius:99px; font-size:14px;
   z-index:80; opacity:0; pointer-events:none; transition:.3s ease; box-shadow:var(--shadow-lg);
   white-space:nowrap; max-width:90vw; overflow:hidden; text-overflow:ellipsis;
 }
@@ -440,6 +468,46 @@ main.pages{ max-width:900px; margin:0 auto; padding:14px 14px calc(94px + var(--
 .mini-progress i{ display:block; height:100%; width:0%; background:var(--gold); }
 .mini-stop{ background:rgba(255,255,255,.05); }
 @media(min-width:760px){ .mini-player{ bottom:16px; } }
+
+/* =========================================================
+   Prophets stories (قصص الأنبياء)
+   ========================================================= */
+.prophet-card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-md); margin-bottom:9px; overflow:hidden; }
+.prophet-head{ width:100%; display:flex; align-items:center; justify-content:space-between; padding:15px 16px; text-align:right; }
+.prophet-name-wrap b{ display:block; font-size:15px; font-weight:800; color:var(--ink); }
+.prophet-name-wrap span{ font-size:11.5px; color:var(--gold); }
+.prophet-head .chev{ width:17px; height:17px; color:var(--ink-faint); transition:transform .25s ease; flex:none; }
+.prophet-card.open .chev{ transform:rotate(180deg); }
+.prophet-body{ max-height:0; overflow:hidden; transition:max-height .3s ease; padding:0 16px; }
+.prophet-card.open .prophet-body{ max-height:400px; padding-bottom:16px; }
+.prophet-body p{ font-size:13.5px; line-height:1.95; color:var(--ink-soft); }
+.prophet-surahs{ display:block; margin-top:10px; font-size:11.5px; color:var(--gold); font-weight:700; }
+
+/* =========================================================
+   Seerah timeline (السيرة النبوية)
+   ========================================================= */
+.seerah-item{ display:flex; gap:14px; }
+.seerah-dot-col{ display:flex; flex-direction:column; align-items:center; flex:none; }
+.seerah-dot{ width:12px; height:12px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 4px var(--emerald-tint); margin-top:6px; flex:none; }
+.seerah-line{ flex:1; width:2px; background:var(--line); margin:4px 0; min-height:30px; }
+.seerah-content{ padding-bottom:22px; }
+.seerah-year{ font-size:11px; color:var(--gold); font-weight:700; }
+.seerah-content h4{ font-size:15px; font-weight:800; color:var(--ink); margin:4px 0 6px; }
+.seerah-content p{ font-size:13.5px; line-height:1.9; color:var(--ink-soft); }
+
+/* =========================================================
+   Fatwa directory (دليل الفتوى)
+   ========================================================= */
+.fatwa-grid{ display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
+.fatwa-card{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:14px 16px; }
+.fatwa-card-txt b{ display:block; font-size:14px; font-weight:800; color:var(--ink); }
+.fatwa-card-txt span{ font-size:11.5px; color:var(--ink-soft); }
+.fatwa-card svg{ width:16px; height:16px; color:var(--emerald-bright); flex:none; }
+
+/* =========================================================
+   Tafsir sheet text
+   ========================================================= */
+.tafsir-text{ font-size:15.5px; line-height:2.05; color:var(--ink); text-align:justify; padding-bottom:6px; }
 
 /* =========================================================
    Responsive

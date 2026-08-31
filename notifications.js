@@ -68,7 +68,9 @@ const NotificationsModule = (()=>{
     try{
       if(!adhanAudioEl) adhanAudioEl = new Audio(ADHAN_AUDIO_URL);
       adhanAudioEl.currentTime = 0;
-      adhanAudioEl.play().catch(()=>{ /* autoplay might be blocked until user interacts once */ });
+      adhanAudioEl.play().catch(()=>{
+        showToast('⚠️ المتصفح منع تشغيل صوت الأذان تلقائيًا — افتح التطبيق ودوس أي حاجة فيه مرة واحدة عشان يتفعّل');
+      });
     }catch(e){ /* silent */ }
   }
   function stopAdhanAudio(){
@@ -86,7 +88,9 @@ const NotificationsModule = (()=>{
     try{
       if(!salawatAudioEl) salawatAudioEl = new Audio(SALAWAT_AUDIO_URL);
       salawatAudioEl.currentTime = 0;
-      salawatAudioEl.play().catch(()=>{ /* autoplay might need a prior user interaction */ });
+      salawatAudioEl.play().catch(()=>{
+        showToast('⚠️ المتصفح منع تشغيل الصوت تلقائيًا — دوس في أي مكان بالتطبيق مرة واحدة عشان يتفعّل الصوت التلقائي');
+      });
     }catch(e){ /* silent */ }
   }
 
@@ -94,6 +98,31 @@ const NotificationsModule = (()=>{
     playSalawatAudio();
     showToast('🌿 اللهم صلِّ وسلِّم على نبينا محمد ﷺ');
     fireNotification('تذكير', 'اللهم صلِّ وسلِّم على نبينا محمد ﷺ', 'salawat');
+  }
+
+  /* ---------------- unlock autoplay on first user interaction ----------------
+     Browsers block unprompted audio.play() unless the page already had a user
+     gesture. We "warm up" both audio elements the moment the user first taps
+     anywhere in the app, so later scheduled plays (adhan / salawat) go through
+     reliably for the rest of the session. */
+  let unlocked = false;
+  function unlockAudioOnce(){
+    if(unlocked) return;
+    unlocked = true;
+    [ADHAN_AUDIO_URL, SALAWAT_AUDIO_URL].forEach((src, i)=>{
+      try{
+        const el = i === 0 ? (adhanAudioEl || (adhanAudioEl = new Audio(src))) : (salawatAudioEl || (salawatAudioEl = new Audio(src)));
+        const prevVolume = el.volume;
+        el.volume = 0;
+        el.play().then(()=>{
+          el.pause();
+          el.currentTime = 0;
+          el.volume = prevVolume;
+        }).catch(()=>{ el.volume = prevVolume; });
+      }catch(e){ /* silent */ }
+    });
+    document.removeEventListener('click', unlockAudioOnce);
+    document.removeEventListener('touchstart', unlockAudioOnce);
   }
 
   /* ---------------- prayer / azkar / hadith schedule ---------------- */
@@ -189,6 +218,8 @@ const NotificationsModule = (()=>{
       // warm up voice list (some browsers populate this asynchronously)
       window.speechSynthesis.getVoices();
     }
+    document.addEventListener('click', unlockAudioOnce, { once:false });
+    document.addEventListener('touchstart', unlockAudioOnce, { once:false, passive:true });
   }
 
   return { requestPermission, refreshSchedules, init };

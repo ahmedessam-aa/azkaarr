@@ -1,4 +1,4 @@
-const CACHE_NAME = 'azkar-app-v3';
+const CACHE_NAME = 'azkar-app-v5';
 const APP_SHELL = [
   './',
   './index.html',
@@ -9,9 +9,14 @@ const APP_SHELL = [
   './listen.js',
   './tasbih.js',
   './azkar.js',
+  './tafsir.js',
+  './content-pages.js',
   './notifications.js',
   './data-azkar.js',
   './data-hadith.js',
+  './data-prophets.js',
+  './data-seerah.js',
+  './data-fatwa.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
@@ -48,6 +53,7 @@ self.addEventListener('fetch', (event)=>{
     url.includes('nominatim.openstreetmap.org') ||
     url.includes('everyayah.com') ||
     url.includes('mp3quran.net') ||
+    url.includes('cdn.jsdelivr.net') ||
     url.includes('cdn.aladhan.com');
 
   if(isDynamic){

@@ -6,7 +6,12 @@ const ListenModule = (()=>{
   let currentReciterId = localStorage.getItem('azkar_listen_reciter') || 'alafasy';
   let currentSurahNum = parseInt(localStorage.getItem('azkar_listen_surah') || '1', 10);
   let audioEl = null;
-  let isPlaying = false;
+  let isPlaying = false;          // used only to drive UI rendering — never trusted for play/pause decisions
+  let lastProgressAt = Date.now();
+  let watchdogTimer = null;
+  let recoveryAttempts = 0;
+  const MAX_RECOVERY_ATTEMPTS = 4;
+  let recovering = false;
 
   function fullReciters(){
     return RECITERS.filter(r => typeof r.surahUrl === 'function');
@@ -18,16 +23,105 @@ const ListenModule = (()=>{
     return surahsList.find(s => s.number === n);
   }
 
+  /* ---------------- core audio element ---------------- */
   function getAudioEl(){
     if(!audioEl){
       audioEl = new Audio();
+      audioEl.preload = 'auto';
+
       audioEl.addEventListener('play', ()=>{ isPlaying = true; syncPlayButtons(); });
+      audioEl.addEventListener('playing', ()=>{
+        isPlaying = true;
+        recoveryAttempts = 0;
+        recovering = false;
+        lastProgressAt = Date.now();
+        syncPlayButtons();
+      });
       audioEl.addEventListener('pause', ()=>{ isPlaying = false; syncPlayButtons(); });
-      audioEl.addEventListener('ended', ()=> playSurah(currentSurahNum + 1 <= 114 ? currentSurahNum + 1 : 1));
-      audioEl.addEventListener('timeupdate', updateProgressUI);
+      audioEl.addEventListener('ended', ()=>{
+        if(recovering) return; // a stall-recovery reload can spuriously fire ended in rare cases — ignore mid-recovery
+        playSurah(currentSurahNum + 1 <= 114 ? currentSurahNum + 1 : 1);
+      });
+      audioEl.addEventListener('timeupdate', ()=>{
+        lastProgressAt = Date.now();
+        updateProgressUI();
+      });
       audioEl.addEventListener('loadedmetadata', updateProgressUI);
+      audioEl.addEventListener('error', ()=> handleStreamFailure('error'));
+      audioEl.addEventListener('stalled', ()=> { /* let the watchdog decide — 'stalled' alone is often harmless */ });
+
+      startWatchdog();
     }
     return audioEl;
+  }
+
+  /* ---------------- stall watchdog ---------------- */
+  // Mobile networks / third-party audio servers sometimes just stop delivering bytes
+  // with no 'error' event at all. If we're supposedly playing but currentTime hasn't
+  // moved in a while, force a reconnect instead of leaving the player stuck.
+  function startWatchdog(){
+    clearInterval(watchdogTimer);
+    watchdogTimer = setInterval(()=>{
+      if(!audioEl || !audioEl.src || recovering) return;
+      if(!audioEl.paused && (Date.now() - lastProgressAt > 12000)){
+        handleStreamFailure('stall');
+      }
+    }, 4000);
+  }
+
+  function handleStreamFailure(reason){
+    if(!audioEl || !audioEl.src || recovering) return;
+    recoveryAttempts++;
+    if(recoveryAttempts > MAX_RECOVERY_ATTEMPTS){
+      recovering = false;
+      isPlaying = false;
+      syncPlayButtons();
+      showToast('تعذّر الاتصال بالصوت — تحقق من الإنترنت وحاول التشغيل يدويًا');
+      return;
+    }
+
+    recovering = true;
+    const savedTime = audioEl.currentTime || 0;
+    const savedSrc = audioEl.src;
+    showToast('انقطع الاتصال بالصوت، جارِ إعادة المحاولة…');
+
+    const el = audioEl;
+    const onReady = ()=>{
+      el.removeEventListener('loadedmetadata', onReady);
+      try{ el.currentTime = savedTime; }catch(e){}
+      attemptPlay(el, 2, ()=>{ recovering = false; });
+    };
+    el.addEventListener('loadedmetadata', onReady);
+    el.src = savedSrc;
+    el.load();
+
+    // safety net in case loadedmetadata never fires (e.g. server unreachable)
+    setTimeout(()=>{
+      if(recovering){
+        el.removeEventListener('loadedmetadata', onReady);
+        recovering = false;
+        if(el.paused) handleStreamFailure('timeout-retry');
+      }
+    }, 9000);
+  }
+
+  /* ---------------- retry-aware play ---------------- */
+  function attemptPlay(el, retries, onSettle){
+    el.play().then(()=>{
+      isPlaying = true;
+      lastProgressAt = Date.now();
+      syncPlayButtons();
+      if(onSettle) onSettle(true);
+    }).catch(()=>{
+      if(retries > 0){
+        setTimeout(()=> attemptPlay(el, retries - 1, onSettle), 900);
+      } else {
+        isPlaying = false;
+        syncPlayButtons();
+        showToast('تعذّر تشغيل الصوت — تحقق من الاتصال بالإنترنت');
+        if(onSettle) onSettle(false);
+      }
+    });
   }
 
   function fmtTime(sec){
@@ -84,7 +178,10 @@ const ListenModule = (()=>{
     }catch(e){ /* not supported everywhere */ }
   }
 
+  /* ---------------- transport controls ---------------- */
   function playSurah(number){
+    recovering = false;
+    recoveryAttempts = 0;
     currentSurahNum = number;
     localStorage.setItem('azkar_listen_surah', String(number));
     const r = reciterById(currentReciterId);
@@ -92,23 +189,43 @@ const ListenModule = (()=>{
 
     const el = getAudioEl();
     el.src = r.surahUrl(number);
-    el.play().catch(()=> showToast('تعذّر تشغيل الصوت — تحقق من الاتصال بالإنترنت'));
+    lastProgressAt = Date.now();
+    attemptPlay(el, 2);
     setMediaSession();
     renderNowPlaying();
     renderSurahList();
   }
 
-  function pause(){ if(audioEl) audioEl.pause(); }
-  function resume(){ if(audioEl && audioEl.src) audioEl.play().catch(()=>{}); }
-  function togglePlay(){ if(!audioEl || !audioEl.src){ playSurah(currentSurahNum); return; } isPlaying ? pause() : resume(); }
+  function pause(){
+    if(audioEl) audioEl.pause();
+  }
+
+  function resume(){
+    const el = getAudioEl();
+    if(!el.src){ playSurah(currentSurahNum); return; }
+    lastProgressAt = Date.now();
+    attemptPlay(el, 2);
+  }
+
+  // Always decide from the real DOM state (el.paused), never from the isPlaying flag —
+  // this is the fix for "play/next/prev stop responding": a stuck flag could never
+  // happen again since every control below re-derives truth from the audio element itself.
+  function togglePlay(){
+    const el = getAudioEl();
+    if(!el.src){ playSurah(currentSurahNum); return; }
+    if(el.paused) resume(); else pause();
+  }
+
   function stopAll(){
+    clearInterval(watchdogTimer);
+    recovering = false;
     if(audioEl){ audioEl.pause(); audioEl.removeAttribute('src'); }
     isPlaying = false;
     syncPlayButtons();
   }
 
   function setReciter(id){
-    const wasPlaying = isPlaying;
+    const wasPlaying = !!(audioEl && !audioEl.paused);
     currentReciterId = id;
     localStorage.setItem('azkar_listen_reciter', id);
     renderReciters();
@@ -219,6 +336,14 @@ const ListenModule = (()=>{
       renderNowPlaying();
     }
   }
+
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible' && audioEl && !audioEl.paused && !recovering){
+      if(Date.now() - lastProgressAt > 8000){
+        handleStreamFailure('visibility-resume');
+      }
+    }
+  });
 
   return { onEnter };
 })();

@@ -43,6 +43,9 @@ function navigateTo(pageId){
   if(pageId === 'quran' && window.QuranModule) QuranModule.onEnter();
   if(pageId === 'listen' && window.ListenModule) ListenModule.onEnter();
   if(pageId === 'hadith' && window.HadithPage) HadithPage.onEnter();
+  if(pageId === 'prophets' && window.ProphetsModule) ProphetsModule.onEnter();
+  if(pageId === 'seerah' && window.SeerahModule) SeerahModule.onEnter();
+  if(pageId === 'fatwa' && window.FatwaModule) FatwaModule.onEnter();
 }
 
 document.addEventListener('click', (e)=>{
@@ -156,6 +159,43 @@ function showToast(msg){
 window.showToast = showToast;
 
 /* =========================================================
+   Theme toggle (light / dark)
+   ========================================================= */
+const SUN_ICON = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+const MOON_ICON = '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>';
+
+function currentTheme(){
+  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+}
+
+function applyThemeIcon(){
+  const icon = document.getElementById('themeIcon');
+  if(!icon) return;
+  // icon shown = the mode a tap will switch TO
+  icon.innerHTML = currentTheme() === 'light' ? MOON_ICON : SUN_ICON;
+}
+
+function updateThemeColorMeta(){
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', currentTheme() === 'light' ? '#0b6e4f' : '#062a1f');
+}
+
+function toggleTheme(){
+  const next = currentTheme() === 'light' ? 'dark' : 'light';
+  if(next === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  else document.documentElement.removeAttribute('data-theme');
+  localStorage.setItem('azkar_theme', next);
+  applyThemeIcon();
+  updateThemeColorMeta();
+}
+
+function initThemeToggle(){
+  applyThemeIcon();
+  updateThemeColorMeta();
+  document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+}
+
+/* =========================================================
    Settings sheet
    ========================================================= */
 function initSettingsSheet(){
@@ -183,7 +223,9 @@ function initSettingsSheet(){
     el.addEventListener('change', async ()=>{
       if(el.checked && key !== 'tasbih_vibrate'){
         const granted = await NotificationsModule.requestPermission();
-        if(!granted){ el.checked = false; showToast('يجب السماح بالإشعارات من إعدادات المتصفح'); return; }
+        if(!granted){
+          showToast('لن تظهر إشعارات النظام، لكن التنبيه والصوت داخل التطبيق هيفضلوا شغالين طول ما التطبيق مفتوح');
+        }
       }
       localStorage.setItem(key, el.checked ? '1' : '0');
       NotificationsModule.refreshSchedules();
@@ -231,6 +273,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   renderHomeHadith();
   renderHomeAzkarChips();
   initSettingsSheet();
+  initThemeToggle();
 
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
@@ -240,6 +283,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   TasbihModule.init();
   AzkarModule.init();
   NotificationsModule.init();
+  TafsirModule.init();
 
   const startPage = location.hash.replace('#','') || 'home';
   navigateTo(startPage);
