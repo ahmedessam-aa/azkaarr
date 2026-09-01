@@ -25,6 +25,29 @@
 </script>
 </head>
 <body>
+
+<div class="launch-overlay" id="launchOverlay">
+  <div class="launch-card">
+    <div class="launch-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.3-4-2-6.5-1.7v13c2.5-.3 4.9.4 6.5 1.7 1.6-1.3 4-2 6.5-1.7v-13c-2.5-.3-4.9.4-6.5 1.7z"/><line x1="12" y1="6.5" x2="12" y2="19.5"/></svg>
+    </div>
+    <span class="launch-label">آية لهذه اللحظة</span>
+    <p class="launch-ayah-text quran-font" id="launchAyahText">
+      <span class="state-msg" style="padding:10px 0;"><span class="spin" style="margin:0 auto 8px;"></span></span>
+    </p>
+    <span class="launch-ayah-ref" id="launchAyahRef"></span>
+
+    <div class="launch-divider"></div>
+
+    <div class="launch-salawat">
+      <span class="launch-salawat-label">وصلِّ على النبي ﷺ</span>
+      <p class="launch-salawat-text">اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ</p>
+    </div>
+
+    <button class="btn btn-gold" id="launchContinueBtn">بسم الله، أكمل إلى التطبيق</button>
+  </div>
+</div>
+
 <div class="app-shell">
 
   <div class="adhan-banner" id="adhanBanner">
@@ -160,7 +183,11 @@
         </button>
         <button class="quick-item" data-hifz-mode="memorization">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg></div>
-          <span>اختبار الحفظ</span>
+          <span>حفظ آية آية</span>
+        </button>
+        <button class="quick-item" data-hifz-mode="memorization-full">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M9 7h6M9 11h6"/></svg></div>
+          <span>حفظ السورة كاملة</span>
         </button>
       </div>
 
@@ -431,7 +458,8 @@
         </div>
         <div class="hifz-mode-tabs">
           <button class="hifz-mode-tab active" data-mode="reading">📖 اختبار القراءة</button>
-          <button class="hifz-mode-tab" data-mode="memorization">🧠 اختبار الحفظ</button>
+          <button class="hifz-mode-tab" data-mode="memorization">🧠 حفظ آية آية</button>
+          <button class="hifz-mode-tab" data-mode="memorization-full">🕋 حفظ السورة كاملة</button>
         </div>
         <div class="card" id="hifzUnsupportedNote" style="display:none; padding:14px 16px; margin-bottom:14px; border-right:3px solid var(--gold);">
           <p style="font-size:12.5px; color:var(--ink-soft); line-height:1.8;">

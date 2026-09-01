@@ -272,9 +272,44 @@ window.addEventListener('appinstalled', ()=>{
 });
 
 /* =========================================================
+   Launch splash — random ayah + salawat, shown first on every open
+   ========================================================= */
+async function initLaunchSplash(){
+  const overlay = document.getElementById('launchOverlay');
+  const textEl = document.getElementById('launchAyahText');
+  const refEl = document.getElementById('launchAyahRef');
+
+  const FALLBACK_AYAHS = [
+    { text: 'وَقُل رَّبِّ زِدْنِي عِلْمًا', ref: 'سورة طه — آية ١١٤' },
+    { text: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا', ref: 'سورة الشرح — آية ٦' },
+    { text: 'وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا', ref: 'سورة الطلاق — آية ٢' },
+  ];
+
+  try{
+    const randomGlobalNum = Math.floor(Math.random()*6236) + 1;
+    const res = await fetch(`https://api.alquran.cloud/v1/ayah/${randomGlobalNum}/quran-uthmani`);
+    const json = await res.json();
+    const d = json.data;
+    textEl.textContent = d.text;
+    refEl.textContent = `سورة ${d.surah.name} — آية ${d.numberInSurah}`;
+  }catch(e){
+    const pick = FALLBACK_AYAHS[Math.floor(Math.random()*FALLBACK_AYAHS.length)];
+    textEl.textContent = pick.text;
+    refEl.textContent = pick.ref;
+  }
+
+  document.getElementById('launchContinueBtn').addEventListener('click', ()=>{
+    overlay.classList.add('hidden');
+    setTimeout(()=> overlay.remove(), 450);
+  });
+}
+
+/* =========================================================
    Init
    ========================================================= */
 document.addEventListener('DOMContentLoaded', ()=>{
+  initLaunchSplash();
+
   renderNav();
   renderGregorianDate();
   renderHomeHadith();

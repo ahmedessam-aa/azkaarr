@@ -28,7 +28,8 @@ const HifzModule = (()=>{
 
   const MODE_LABELS = {
     reading: { title: 'اختبار القراءة', desc: 'الآيات ظاهرة قدامك — اقرأها بصوتك وهيتصحح نطقك', recordLabel: 'ابدأ القراءة', placeholder: null },
-    memorization: { title: 'اختبار الحفظ', desc: 'الآيات مخفية — اقرأها من حفظك، وهيتكتب اللي بتقوله أول بأول، وبعدها يتصحح', recordLabel: 'ابدأ التسميع', placeholder: 'اضغط "ابدأ التسميع" واقرأ الآية من حفظك — مش هتشوف نصها إلا بعد ما تخلّص' }
+    memorization: { title: 'اختبار الحفظ', desc: 'الآيات مخفية — اقرأها من حفظك، وهيتكتب اللي بتقوله أول بأول، وبعدها يتصحح', recordLabel: 'ابدأ التسميع', placeholder: 'اضغط "ابدأ التسميع" واقرأ الآية من حفظك — مش هتشوف نصها إلا بعد ما تخلّص' },
+    'memorization-full': { title: 'حفظ السورة كاملة', desc: 'اقرأ السورة من أولها لآخرها من حفظك من غير توقف، وأول ما توقف هيتصحح كل حرف قلته دفعة واحدة', recordLabel: 'ابدأ تسميع السورة كاملة', placeholder: 'اضغط "ابدأ تسميع السورة كاملة" واقرأ من أول السورة لآخرها من حفظك، ثم دوس "إيقاف" لما تخلص' }
   };
 
   /* ---------------- Arabic text normalization for matching ---------------- */
@@ -69,6 +70,29 @@ const HifzModule = (()=>{
       }
     }
     return refWords.map((w, idx)=> ({ word: w, status: matchedRefIdx.has(idx) ? 'ok' : 'missing' }));
+  }
+
+  // بيبني مصفوفة كلمات السورة كاملة، وكل كلمة معاها رقم الآية اللي جاية منها
+  function buildFullReference(){
+    const flat = [];
+    currentAyahs.forEach(a=>{
+      normalize(a.simple).split(' ').filter(Boolean).forEach(w=> flat.push({ word: w, ayahNum: a.numberInSurah }));
+    });
+    return flat;
+  }
+
+  // بيرسم التصحيح مقسّم حسب الآية، مع رقم كل آية ظاهر قبل كلماتها
+  function renderGroupedDiff(diffWithAyah){
+    let html = '';
+    let lastAyah = null;
+    diffWithAyah.forEach(d=>{
+      if(d.ayahNum !== lastAyah){
+        html += `<span class="hifz-full-ayah-badge">﴿${d.ayahNum}﴾</span> `;
+        lastAyah = d.ayahNum;
+      }
+      html += `<span class="hifz-word ${d.status === 'ok' ? 'ok' : 'bad'}">${d.word}</span> `;
+    });
+    return html;
   }
 
   /* ---------------- speech recognition ---------------- */
@@ -130,7 +154,10 @@ const HifzModule = (()=>{
       isListening = false;
       card.classList.remove('listening');
       liveEl.style.display = 'none';
-      if(finalTranscript.trim()) evaluateAyah(idx, finalTranscript);
+      if(finalTranscript.trim()){
+        if(idx === 'full') evaluateFullSurah(finalTranscript);
+        else evaluateAyah(idx, finalTranscript);
+      }
     };
 
     try{
@@ -187,6 +214,31 @@ const HifzModule = (()=>{
     updateProgressSummary();
   }
 
+  function evaluateFullSurah(saidText){
+    const flatRef = buildFullReference();
+    const refWordsPlain = flatRef.map(f=> f.word);
+    const saidWords = normalize(saidText).split(' ').filter(Boolean);
+    const diff = diffWords(refWordsPlain, saidWords);
+    const diffWithAyah = diff.map((d,i)=> ({ ...d, ayahNum: flatRef[i].ayahNum }));
+
+    const correctCount = diff.filter(d=> d.status === 'ok').length;
+    const pct = refWordsPlain.length ? Math.round((correctCount / refWordsPlain.length) * 100) : 0;
+    const scoreClass = pct >= 90 ? 'great' : pct >= 60 ? 'mid' : 'low';
+
+    const card = document.querySelector('.hifz-full-card');
+    const resultEl = card.querySelector('.hifz-result');
+    const wordsHtml = renderGroupedDiff(diffWithAyah);
+
+    resultEl.innerHTML = `
+      <div class="hifz-score ${scoreClass}">${pct}% مطابقة (${correctCount} من ${refWordsPlain.length} كلمة على مستوى السورة كاملة)</div>
+      <p class="hifz-diff-text hifz-full-diff">${wordsHtml}</p>
+      ${pct < 100 ? '<span class="hifz-hint">الكلمات الحمراء لم تُنطق أو اختلفت — رقم الآية المشار إليه بجانبها يساعدك تراجعها</span>' : ''}
+    `;
+
+    saveScore(currentSurahNum, 'full', pct);
+    updateProgressSummary();
+  }
+
   /* ---------------- reference audio (hear correct recitation) ---------------- */
   function playReference(idx){
     const ayah = currentAyahs[idx];
@@ -210,13 +262,45 @@ const HifzModule = (()=>{
 
   function updateProgressSummary(){
     const scores = getScores(currentSurahNum);
+    const el = document.getElementById('hifzProgressSummary');
+    if(testMode === 'memorization-full'){
+      if(el) el.textContent = scores['full'] != null
+        ? `أفضل نتيجة: ${scores['full']}% مطابقة على مستوى السورة كاملة`
+        : `لسه مجربتش اختبار السورة كاملة`;
+      return;
+    }
     const vals = Object.values(scores);
     const tested = vals.length;
     const avg = tested ? Math.round(vals.reduce((a,b)=>a+b,0)/tested) : 0;
-    const el = document.getElementById('hifzProgressSummary');
     if(el) el.textContent = tested
       ? `تم اختبار ${tested} من ${currentAyahs.length} آية — متوسط المطابقة ${avg}%`
       : `لسه مبدأتش الاختبار في السورة دي`;
+  }
+
+  /* ---------------- full-surah mode rendering ---------------- */
+  function renderFullSurahCard(){
+    const list = document.getElementById('hifzAyahList');
+    const scores = getScores(currentSurahNum);
+    const savedPct = scores['full'];
+    list.innerHTML = `
+      <div class="hifz-card hifz-full-card" data-idx="full">
+        <div class="hifz-card-top">
+          <span class="hifz-ayah-badge">السورة كاملة — ${currentAyahs.length} آية${savedPct != null ? ` · أفضل نتيجة ${savedPct}%` : ''}</span>
+        </div>
+        <p class="hifz-memo-placeholder">${MODE_LABELS['memorization-full'].placeholder}</p>
+        <div class="hifz-live" style="display:none;"></div>
+        <div class="hifz-result"></div>
+        <button class="hifz-record-btn">
+          <span class="hifz-record-dot"></span>
+          <span class="hifz-record-label">${MODE_LABELS['memorization-full'].recordLabel}</span>
+        </button>
+      </div>
+    `;
+    document.querySelector('.hifz-full-card .hifz-record-btn').addEventListener('click', ()=>{
+      if(isListening){ stopAyahTest(); }
+      else{ startAyahTest('full'); }
+    });
+    updateProgressSummary();
   }
 
   /* ---------------- rendering ---------------- */
@@ -277,7 +361,8 @@ const HifzModule = (()=>{
       const uth = (await uthRes.json()).data.ayahs;
       const simple = (await simpleRes.json()).data.ayahs;
       currentAyahs = uth.map((a, i)=> ({ numberInSurah: a.numberInSurah, text: a.text, simple: simple[i].text }));
-      renderAyahCards();
+      if(testMode === 'memorization-full') renderFullSurahCard();
+      else renderAyahCards();
     }catch(e){
       list.innerHTML = `<div class="state-msg">تعذّر تحميل السورة — تحقق من الاتصال وحاول مرة أخرى.</div>`;
     }
