@@ -10,14 +10,18 @@ const ProphetsModule = (()=>{
       <div class="prophet-card" data-i="${i}">
         <button class="prophet-head">
           <div class="prophet-name-wrap">
-            <b>${p.name}</b>
-            <span>${p.title}</span>
+            <span class="prophet-order">${p.order}</span>
+            <div>
+              <b>${p.name}</b>
+              <span>${p.title}</span>
+            </div>
           </div>
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="prophet-body">
           <p>${p.summary}</p>
-          <span class="prophet-surahs">أهم السور: ${p.surahs}</span>
+          <span class="prophet-lineage">🔗 ${p.lineage}</span>
+          <span class="prophet-surahs">📖 أهم السور: ${p.surahs}</span>
         </div>
       </div>
     `).join('');
@@ -110,3 +114,37 @@ const FatwaModule = (()=>{
   return { onEnter };
 })();
 window.FatwaModule = FatwaModule;
+
+/* ============ الأدعية ============ */
+const DuasModule = (()=>{
+  let loaded = false;
+  function render(){
+    const wrap = document.getElementById('duasList');
+    wrap.innerHTML = DUAS_DATA.map((cat, ci) => `
+      <div class="section-title" style="margin-top:${ci===0?'0':'18px'};"><h2>${cat.icon} ${cat.category}</h2></div>
+      ${cat.items.map((it, ii) => `
+        <div class="prophet-card" data-cat="${ci}" data-i="${ii}">
+          <button class="prophet-head">
+            <div class="prophet-name-wrap">
+              <b>دعاء ${ii+1}</b>
+              <span>${it.source}</span>
+            </div>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="prophet-body">
+            <p class="quran-font" style="font-size:17px; line-height:2;">${it.text}</p>
+          </div>
+        </div>
+      `).join('')}
+    `).join('');
+
+    wrap.querySelectorAll('.prophet-card').forEach(card=>{
+      card.querySelector('.prophet-head').addEventListener('click', ()=> card.classList.toggle('open'));
+    });
+  }
+  function onEnter(){
+    if(!loaded){ loaded = true; render(); }
+  }
+  return { onEnter };
+})();
+window.DuasModule = DuasModule;

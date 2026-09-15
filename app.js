@@ -47,6 +47,11 @@ function navigateTo(pageId){
   if(pageId === 'seerah' && window.SeerahModule) SeerahModule.onEnter();
   if(pageId === 'fatwa' && window.FatwaModule) FatwaModule.onEnter();
   if(pageId === 'hifz' && window.HifzModule) HifzModule.onEnter();
+  if(pageId === 'khatm' && window.KhatmModule) KhatmModule.onEnter();
+  if(pageId === 'qibla' && window.QiblaModule) QiblaModule.onEnter();
+  if(pageId === 'mosques' && window.MosquesModule) MosquesModule.onEnter();
+  if(pageId === 'duas' && window.DuasModule) DuasModule.onEnter();
+  if(pageId === 'prayer' && window.PrayerTrackerModule) PrayerTrackerModule.init();
 }
 
 document.addEventListener('click', (e)=>{
@@ -60,6 +65,15 @@ document.addEventListener('click', (e)=>{
   if(hifzEl && window.HifzModule){
     e.preventDefault();
     HifzModule.openWithMode(hifzEl.dataset.hifzMode);
+    return;
+  }
+  const catEl = e.target.closest('[data-nav-cat]');
+  if(catEl){
+    e.preventDefault();
+    navigateTo(catEl.dataset.navCat);
+    if(catEl.dataset.navCat === 'azkar' && catEl.dataset.cat && window.AzkarModule){
+      AzkarModule.selectCategory(catEl.dataset.cat);
+    }
   }
 });
 
@@ -140,6 +154,7 @@ function renderHomeAzkarChips(){
     {key:'afterPrayer', label:'بعد الصلاة', emoji:'🤲'},
   ];
   const wrap = document.getElementById('homeAzkarChips');
+  if(!wrap) return;
   wrap.innerHTML = cats.map(c => {
     const data = AZKAR_DATA[c.key];
     return `<button class="azkar-chip" data-cat="${c.key}">${c.emoji} ${data.title} <span class="count">${data.items.length}</span></button>`;
@@ -203,6 +218,76 @@ function initThemeToggle(){
 }
 
 /* =========================================================
+   More sheet (كل الأقسام)
+   ========================================================= */
+function initMoreSheet(){
+  const sheet = document.getElementById('moreSheet');
+  const overlay = document.getElementById('moreSheetOverlay');
+  const open = ()=>{ sheet.classList.add('open'); overlay.classList.add('open'); };
+  const close = ()=>{ sheet.classList.remove('open'); overlay.classList.remove('open'); };
+
+  document.getElementById('moreMenuBtn').addEventListener('click', open);
+  overlay.addEventListener('click', close);
+  sheet.querySelectorAll('.more-item').forEach(item=>{
+    item.addEventListener('click', close);
+  });
+}
+
+/* =========================================================
+   Header search (Quran surahs)
+   ========================================================= */
+function initHeaderSearch(){
+  const overlay = document.getElementById('searchSheetOverlay');
+  const sheet = document.getElementById('searchSheet');
+  const input = document.getElementById('headerSearchInput');
+  const results = document.getElementById('headerSearchResults');
+
+  const open = async ()=>{
+    sheet.classList.add('open');
+    overlay.classList.add('open');
+    input.value = '';
+    results.innerHTML = '';
+    setTimeout(()=> input.focus(), 200);
+  };
+  const close = ()=>{
+    sheet.classList.remove('open');
+    overlay.classList.remove('open');
+  };
+
+  document.getElementById('headerSearchBtn').addEventListener('click', open);
+  overlay.addEventListener('click', close);
+
+  input.addEventListener('input', async ()=>{
+    const q = input.value.trim().toLowerCase();
+    if(!q){ results.innerHTML = ''; return; }
+    const surahs = await QuranModule.getSurahs();
+    const matches = surahs.filter(s =>
+      s.name.includes(input.value.trim()) ||
+      s.englishName.toLowerCase().includes(q) ||
+      String(s.number) === q
+    ).slice(0, 12);
+
+    results.innerHTML = matches.length ? matches.map(s => `
+      <button class="surah-row" data-n="${s.number}" style="width:100%; margin-bottom:7px;">
+        <div class="left">
+          <div class="surah-num">${s.number}</div>
+          <div class="surah-names"><b>${s.englishName}</b><span>${s.numberOfAyahs} آية</span></div>
+        </div>
+        <div class="ar-name">${s.name}</div>
+      </button>
+    `).join('') : `<div class="state-msg" style="padding:20px 0;">لا توجد نتائج</div>`;
+
+    results.querySelectorAll('.surah-row').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        close();
+        QuranModule.openSurah(parseInt(btn.dataset.n, 10));
+        navigateTo('quran');
+      });
+    });
+  });
+}
+
+/* =========================================================
    Settings sheet
    ========================================================= */
 function initSettingsSheet(){
@@ -212,7 +297,8 @@ function initSettingsSheet(){
   const close = ()=>{ sheet.classList.remove('open'); overlay.classList.remove('open'); };
 
   document.getElementById('settingsBtn').addEventListener('click', open);
-  document.getElementById('notifBtn').addEventListener('click', open);
+
+  initHeaderSearch();
   overlay.addEventListener('click', close);
 
   // toggles persistence
@@ -315,6 +401,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   renderHomeHadith();
   renderHomeAzkarChips();
   initSettingsSheet();
+  initMoreSheet();
   initThemeToggle();
 
   if('serviceWorker' in navigator){
