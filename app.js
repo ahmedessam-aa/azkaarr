@@ -227,6 +227,7 @@ function initMoreSheet(){
   const close = ()=>{ sheet.classList.remove('open'); overlay.classList.remove('open'); };
 
   document.getElementById('moreMenuBtn').addEventListener('click', open);
+  document.getElementById('moreDrawerCloseBtn').addEventListener('click', close);
   overlay.addEventListener('click', close);
   sheet.querySelectorAll('.more-item').forEach(item=>{
     item.addEventListener('click', close);

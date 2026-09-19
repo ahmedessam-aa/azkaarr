@@ -1,4 +1,4 @@
-const CACHE_NAME = 'azkar-app-v11';
+const CACHE_NAME = 'azkar-app-v12';
 const APP_SHELL = [
   './',
   './index.html',
@@ -61,6 +61,7 @@ self.addEventListener('fetch', (event)=>{
     url.includes('mp3quran.net') ||
     url.includes('cdn.jsdelivr.net') ||
     url.includes('overpass-api.de') ||
+    url.includes('pxhere.com') ||
     url.includes('cdn.aladhan.com');
 
   if(isDynamic){

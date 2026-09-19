@@ -9,8 +9,11 @@ const RECITERS = [
   { id: 'minshawy', folder: 'Minshawy_Murattal_128kbps',   name: 'محمد صديق المنشاوي',   surahUrl: n => `https://server10.mp3quran.net/minsh/${pad3g(n)}.mp3` },
   { id: 'muaiqly',  folder: 'Maher_AlMuaiqly_64kbps',      name: 'ماهر المعيقلي',        surahUrl: n => `https://server12.mp3quran.net/maher/${pad3g(n)}.mp3` },
   { id: 'dosari',   folder: 'Yasser_Ad-Dussary_128kbps',   name: 'ياسر الدوسري',         surahUrl: n => `https://server11.mp3quran.net/download/yasser/${pad3g(n)}.mp3` },
+  { id: 'sudais',   folder: 'Abdurrahmaan_As-Sudais_192kbps', name: 'عبد الرحمن السديس', surahUrl: n => `https://server11.mp3quran.net/download/sds/${pad3g(n)}.mp3` },
+  { id: 'ajmy',     folder: null, name: 'أحمد العجمي',       surahUrl: n => `https://server10.mp3quran.net/download/ajm/${pad3g(n)}.mp3` },
+  { id: 'ghamdi',   folder: null, name: 'سعد الغامدي',          surahUrl: n => `https://server7.mp3quran.net/download/s_gmd/${pad3g(n)}.mp3` },
+  { id: 'shuraim',  folder: null, name: 'سعود الشريم',          surahUrl: n => `https://server7.mp3quran.net/download/shur/${pad3g(n)}.mp3` },
   { id: 'basit',    folder: 'Abdul_Basit_Murattal_192kbps',name: 'عبد الباسط عبد الصمد', surahUrl: null },
-  { id: 'sudais',   folder: 'Abdurrahmaan_As-Sudais_192kbps', name: 'عبد الرحمن السديس', surahUrl: null },
 ];
 
 const QuranModule = (()=>{
@@ -21,6 +24,7 @@ const QuranModule = (()=>{
   let surahs = [];
   let loadedOnce = false;
   let currentPage = 1;
+  let lockRange = null; // {min, max} — يُفعّل لما القراءة جاية من خطة ختم القرآن، يمنع التصفح خارج وِرد اليوم
   let currentPageAyahs = [];   // ayahs on the current page (with surah info)
   let currentReciterId = localStorage.getItem('azkar_reciter') || 'alafasy';
 
@@ -129,6 +133,9 @@ const QuranModule = (()=>{
 
   /* ---------------- open a specific mushaf page (1-604) ---------------- */
   async function openPage(pageNum){
+    if(lockRange){
+      pageNum = Math.max(lockRange.min, Math.min(lockRange.max, pageNum));
+    }
     if(pageNum < 1 || pageNum > TOTAL_PAGES) return;
     stopAudio();
 
@@ -140,6 +147,7 @@ const QuranModule = (()=>{
     textEl.innerHTML = `<div class="state-msg"><div class="spin"></div>جارِ تحميل الصفحة…</div>`;
     document.getElementById('mushafPageNum').textContent = `صفحة ${pageNum} / ${TOTAL_PAGES}`;
     document.getElementById('audioBar').style.display = 'none';
+    renderLockBanner();
 
     try{
       const res = await fetch(`${API_BASE}/page/${pageNum}/quran-uthmani`);
@@ -182,19 +190,40 @@ const QuranModule = (()=>{
 
       document.getElementById('audioBar').style.display = 'flex';
       updateAudioMeta();
-      saveLastRead(pageNum, firstSurah.name);
+      if(!lockRange) saveLastRead(pageNum, firstSurah.name);
     }catch(e){
       textEl.innerHTML = `<div class="state-msg">تعذّر تحميل الصفحة. تحقق من الاتصال وحاول مرة أخرى.</div>`;
     }
 
-    document.getElementById('prevPageBtn').disabled = pageNum <= 1;
-    document.getElementById('nextPageBtn').disabled = pageNum >= TOTAL_PAGES;
+    const minBound = lockRange ? lockRange.min : 1;
+    const maxBound = lockRange ? lockRange.max : TOTAL_PAGES;
+    document.getElementById('prevPageBtn').disabled = pageNum <= minBound;
+    document.getElementById('nextPageBtn').disabled = pageNum >= maxBound;
+  }
+
+  function renderLockBanner(){
+    const el = document.getElementById('khatmLockBanner');
+    if(!el) return;
+    if(lockRange){
+      el.style.display = 'flex';
+      el.querySelector('span').textContent = `وِردك اليوم: من صفحة ${lockRange.min} إلى ${lockRange.max}`;
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  function setLockRange(min, max){
+    lockRange = { min, max };
+  }
+  function clearLockRange(){
+    lockRange = null;
+    renderLockBanner();
   }
 
   /* ---------------- reciter bar ---------------- */
   function renderReciterBar(){
     const bar = document.getElementById('reciterBar');
-    bar.innerHTML = RECITERS.map(r => `
+    bar.innerHTML = RECITERS.filter(r => r.folder).map(r => `
       <button class="reciter-chip ${r.id === currentReciterId ? 'active' : ''}" data-id="${r.id}">${r.name}</button>
     `).join('');
     bar.querySelectorAll('.reciter-chip').forEach(chip=>{
@@ -288,6 +317,7 @@ const QuranModule = (()=>{
   function initReaderNav(){
     document.getElementById('quranBackBtn').addEventListener('click', ()=>{
       stopAudio();
+      clearLockRange();
       document.getElementById('quranReaderView').style.display = 'none';
       document.getElementById('quranListView').style.display = 'block';
     });
@@ -295,6 +325,7 @@ const QuranModule = (()=>{
     document.getElementById('nextPageBtn').addEventListener('click', ()=> openPage(currentPage + 1));
     document.getElementById('audioPlayBtn').addEventListener('click', togglePlayback);
     document.getElementById('audioStopBtn').addEventListener('click', stopAudio);
+    document.getElementById('khatmLockExitBtn').addEventListener('click', clearLockRange);
     initSwipe();
   }
 
@@ -319,7 +350,7 @@ const QuranModule = (()=>{
     renderContinueCard();
   }
 
-  return { onEnter, openSurah, openPage, getSurahs };
+  return { onEnter, openSurah, openPage, getSurahs, setLockRange, clearLockRange };
 })();
 window.QuranModule = QuranModule;
 window.RECITERS = RECITERS;

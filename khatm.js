@@ -85,8 +85,9 @@ const KhatmModule = (()=>{
   }
 
   function readNow(){
-    const { startPage } = todayRange();
+    const { startPage, endPage } = todayRange();
     if(window.QuranModule){
+      QuranModule.setLockRange(startPage, endPage);
       QuranModule.openPage(startPage);
       navigateTo('quran');
     }

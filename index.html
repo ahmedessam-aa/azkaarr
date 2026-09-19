@@ -67,6 +67,9 @@
   <!-- ============ TOP APP BAR ============ -->
   <header class="topbar">
     <div class="topbar-inner">
+      <button class="tb-icon-btn tb-hamburger" id="moreMenuBtn" aria-label="القائمة">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
       <div class="tb-brand">
         <img src="icon-nav.png" class="tb-logo" alt="أذكار">
         <div class="tb-titles">
@@ -77,9 +80,6 @@
       <div class="tb-actions">
         <button class="tb-icon-btn" id="headerSearchBtn" aria-label="بحث">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </button>
-        <button class="tb-icon-btn" id="moreMenuBtn" aria-label="المزيد">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
         </button>
         <button class="tb-icon-btn" id="themeToggleBtn" aria-label="تبديل الوضع الليلي/النهاري">
           <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></svg>
@@ -101,38 +101,16 @@
 
       <!-- ============ HERO ============ -->
       <div class="home-hero">
-        <svg class="home-hero-art" viewBox="0 0 400 220" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="var(--emerald-deeper)"/>
-              <stop offset="100%" stop-color="var(--emerald-deep)"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="220" fill="url(#skyGrad)"/>
-          <circle cx="335" cy="45" r="26" fill="rgba(255,255,255,.05)"/>
-          <g fill="rgba(0,0,0,.22)">
-            <rect x="30" y="150" width="14" height="70"/>
-            <polygon points="23,150 51,150 37,120"/>
-            <rect x="34" y="108" width="6" height="16"/>
-            <rect x="356" y="150" width="14" height="70"/>
-            <polygon points="349,150 377,150 363,120"/>
-            <rect x="360" y="108" width="6" height="16"/>
-            <rect x="90" y="170" width="220" height="50"/>
-            <path d="M90 170 Q90 100 200 100 Q310 100 310 170 Z"/>
-            <rect x="193" y="70" width="14" height="34"/>
-            <circle cx="200" cy="62" r="9"/>
-            <path d="M200 44 L206 58 L194 58 Z"/>
-            <circle cx="130" cy="195" r="14"/>
-            <circle cx="200" cy="195" r="16"/>
-            <circle cx="270" cy="195" r="14"/>
-          </g>
-        </svg>
+        <img class="home-hero-photo" src="https://get.pxhere.com/photo/architecture-building-place-of-worship-observatory-grand-buildings-mosque-uae-dome-middle-arabic-east-muslim-islamic-abu-dhabi-religious-architecture-byzantine-architecture-1008932.jpg" alt="المسجد الشيخ زايد الكبير - أبوظبي" loading="eager">
         <div class="home-hero-overlay"></div>
         <div class="home-hero-content">
-          <span class="home-hero-eyebrow">أهلًا بك</span>
+          <span class="home-hero-eyebrow">✦ أهلًا بك ✦</span>
           <h1>موقعك اليومي لأذكار تقربك من الله</h1>
           <p>مواقيت الصلاة، القرآن الكريم، الأذكار، والدعاء — كل ما تحتاجه في مكان واحد هادئ</p>
-          <button class="btn btn-gold home-hero-cta" data-nav="azkar">ابدأ الآن</button>
+          <button class="home-hero-cta" data-nav="azkar">
+            <span>ابدأ الآن</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
         </div>
       </div>
 
@@ -381,6 +359,11 @@
         </div>
 
         <div class="reciter-bar" id="reciterBar"></div>
+
+        <div class="khatm-lock-banner" id="khatmLockBanner" style="display:none;">
+          <span>وِردك اليوم: —</span>
+          <button id="khatmLockExitBtn">إنهاء وضع الورد</button>
+        </div>
 
         <div class="mushaf-frame">
           <div class="mushaf-topline">
@@ -743,11 +726,15 @@
     <div class="bottom-nav-inner" id="bottomNav"></div>
   </nav>
 
-  <!-- ============ MORE SHEET ============ -->
+  <!-- ============ MORE SHEET (side drawer) ============ -->
   <div class="sheet-overlay" id="moreSheetOverlay"></div>
-  <div class="sheet" id="moreSheet">
-    <div class="sheet-handle"></div>
-    <h3>كل الأقسام</h3>
+  <div class="sheet side-drawer" id="moreSheet">
+    <div class="side-drawer-head">
+      <h3>كل الأقسام</h3>
+      <button class="tb-icon-btn" id="moreDrawerCloseBtn" aria-label="إغلاق">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
     <div class="more-grid">
       <button class="more-item" data-nav="hadith">
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
