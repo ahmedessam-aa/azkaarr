@@ -27,6 +27,10 @@ function updateNavActive(pageId){
   document.querySelectorAll('.nav-btn').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.nav === pageId);
   });
+  // highlight the current page inside the side menu too
+  document.querySelectorAll('.more-item[data-nav]').forEach(item=>{
+    item.classList.toggle('active', item.dataset.nav === pageId);
+  });
 }
 
 /* =========================================================
@@ -223,15 +227,49 @@ function initThemeToggle(){
 function initMoreSheet(){
   const sheet = document.getElementById('moreSheet');
   const overlay = document.getElementById('moreSheetOverlay');
-  const open = ()=>{ sheet.classList.add('open'); overlay.classList.add('open'); };
+  const toggles = Array.from(sheet.querySelectorAll('[data-toggle]'));
+
+  // expand / collapse one group of the menu (only one group is open at a time)
+  const setExpanded = (btn, expanded)=>{
+    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    const sub = document.getElementById(btn.getAttribute('aria-controls'));
+    if(sub) sub.classList.toggle('open', expanded);
+  };
+  toggles.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const willOpen = btn.getAttribute('aria-expanded') !== 'true';
+      toggles.forEach(o => setExpanded(o, false));
+      setExpanded(btn, willOpen);
+    });
+  });
+
+  // when the menu opens, start collapsed — except the group that holds the page you're on
+  const syncExpanded = ()=>{
+    toggles.forEach(o => setExpanded(o, false));
+    const active = sheet.querySelector('.more-sub .more-item.active');
+    if(active){
+      const parent = active.closest('.more-parent');
+      const btn = parent && parent.querySelector('[data-toggle]');
+      if(btn) setExpanded(btn, true);
+    }
+  };
+
+  const open = ()=>{ syncExpanded(); sheet.classList.add('open'); overlay.classList.add('open'); };
   const close = ()=>{ sheet.classList.remove('open'); overlay.classList.remove('open'); };
 
   document.getElementById('moreMenuBtn').addEventListener('click', open);
   document.getElementById('moreDrawerCloseBtn').addEventListener('click', close);
   overlay.addEventListener('click', close);
-  sheet.querySelectorAll('.more-item').forEach(item=>{
+  sheet.querySelectorAll('.more-item:not([data-toggle])').forEach(item=>{
     item.addEventListener('click', close);
   });
+  // "الإعدادات والإشعارات" inside the menu opens the settings sheet
+  const settingsItem = document.getElementById('moreSettingsItem');
+  if(settingsItem){
+    settingsItem.addEventListener('click', ()=>{
+      setTimeout(()=> document.getElementById('settingsBtn').click(), 180);
+    });
+  }
 }
 
 /* =========================================================
@@ -355,7 +393,7 @@ document.getElementById('installBtn').addEventListener('click', async ()=>{
 });
 
 window.addEventListener('appinstalled', ()=>{
-  showToast('تم تثبيت تطبيق أذكار بنجاح 🎉');
+  showToast('تم تثبيت تطبيق أذكاري بنجاح 🎉');
 });
 
 /* =========================================================

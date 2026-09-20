@@ -13,6 +13,9 @@ const RECITERS = [
   { id: 'ajmy',     folder: null, name: 'أحمد العجمي',       surahUrl: n => `https://server10.mp3quran.net/download/ajm/${pad3g(n)}.mp3` },
   { id: 'ghamdi',   folder: null, name: 'سعد الغامدي',          surahUrl: n => `https://server7.mp3quran.net/download/s_gmd/${pad3g(n)}.mp3` },
   { id: 'shuraim',  folder: null, name: 'سعود الشريم',          surahUrl: n => `https://server7.mp3quran.net/download/shur/${pad3g(n)}.mp3` },
+  { id: 'ayyub',    folder: null, name: 'محمد أيوب',             surahUrl: n => `https://server8.mp3quran.net/download/ayyub/${pad3g(n)}.mp3` },
+  { id: 'qatami',   folder: null, name: 'ناصر القطامي',          surahUrl: n => `https://server6.mp3quran.net/download/qtm/${pad3g(n)}.mp3` },
+  { id: 'jalil',    folder: null, name: 'خالد الجليل',           surahUrl: n => `https://server10.mp3quran.net/download/jleel/${pad3g(n)}.mp3` },
   { id: 'basit',    folder: 'Abdul_Basit_Murattal_192kbps',name: 'عبد الباسط عبد الصمد', surahUrl: null },
 ];
 

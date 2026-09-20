@@ -1,4 +1,4 @@
-const CACHE_NAME = 'azkar-app-v12';
+const CACHE_NAME = 'azkar-app-v14';
 const APP_SHELL = [
   './',
   './index.html',
@@ -30,6 +30,9 @@ const APP_SHELL = [
   './icon-512-maskable.png',
   './favicon.png',
   './icon-180.png',
+  './icon-nav.png',
+  './hero-mosque.jpg',
+  './footer-mosque.jpg',
   './adhan.mp3',
   './salawat.mp3'
 ];
