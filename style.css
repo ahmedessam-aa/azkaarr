@@ -390,7 +390,6 @@ main.pages{ max-width:900px; margin:0 auto; padding:14px 14px calc(94px + var(--
 .switch input:checked + .slider{ background:var(--emerald); }
 .switch input:checked + .slider::before{ transform:translateX(-19px); }
 
-.install-btn-row{ margin-top:16px; }
 
 /* custom time-based reminders (Notifications sheet) */
 .notif-custom-section{ margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }

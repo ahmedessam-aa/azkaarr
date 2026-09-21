@@ -453,36 +453,6 @@ function renderCustomReminders(){
 }
 
 /* =========================================================
-   PWA install
-   ========================================================= */
-let deferredInstallPrompt = null;
-window.addEventListener('beforeinstallprompt', (e)=>{
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  document.getElementById('installHint').textContent = 'ثبّت التطبيق على شاشتك الرئيسية ليعمل مثل أي تطبيق آخر — بدون متجر تطبيقات';
-});
-
-document.getElementById('installBtn').addEventListener('click', async ()=>{
-  if(deferredInstallPrompt){
-    deferredInstallPrompt.prompt();
-    const choice = await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    if(choice.outcome === 'accepted') showToast('جارِ تثبيت التطبيق…');
-  } else {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if(isIOS){
-      showToast('لإضافة التطبيق: اضغط زر المشاركة ثم "إضافة إلى الشاشة الرئيسية"');
-    } else {
-      showToast('التطبيق مثبّت بالفعل، أو افتح قائمة المتصفح واختر "تثبيت التطبيق"');
-    }
-  }
-});
-
-window.addEventListener('appinstalled', ()=>{
-  showToast('تم تثبيت تطبيق أذكاري بنجاح 🎉');
-});
-
-/* =========================================================
    Launch splash — random ayah + salawat, shown first on every open
    ========================================================= */
 async function initLaunchSplash(){
