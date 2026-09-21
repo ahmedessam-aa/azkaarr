@@ -37,6 +37,13 @@ const QuranModule = (()=>{
   let isPlaying = false;
 
   function pad3(n){ return String(n).padStart(3,'0'); }
+  function toArabicDigits(n){ return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
+
+  // info about an ayah that is on the page currently open (used by the tafsir sheet → favourites)
+  function getAyahInfo(surahNum, ayahNum){
+    const a = currentPageAyahs.find(x => x.surah.number === surahNum && x.numberInSurah === ayahNum);
+    return a ? { text: a.text, page: a.page || currentPage, surahName: a.surah.name } : { text: '', page: currentPage, surahName: '' };
+  }
 
   function currentReciter(){
     return RECITERS.find(r => r.id === currentReciterId) || RECITERS[0];
@@ -58,7 +65,7 @@ const QuranModule = (()=>{
     const card = document.getElementById('continueCard');
     if(!raw){ card.style.display = 'none'; return; }
     const data = JSON.parse(raw);
-    document.getElementById('continueLabel').textContent = `سورة ${data.name} — صفحة ${data.page}`;
+    document.getElementById('continueLabel').textContent = `${surahLabel(data.name)} — صفحة ${data.page}`;
     card.style.display = 'flex';
     document.getElementById('continueBtn').onclick = ()=> openPage(data.page);
   }
@@ -86,16 +93,19 @@ const QuranModule = (()=>{
       return;
     }
     container.innerHTML = list.map(s => `
-      <button class="surah-row" data-n="${s.number}">
-        <div class="left">
-          <div class="surah-num">${s.number}</div>
-          <div class="surah-names">
-            <b>${s.englishName}</b>
-            <span>${s.englishNameTranslation} · ${s.numberOfAyahs} آية · ${s.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
+      <div class="surah-item">
+        <button class="surah-row" data-n="${s.number}">
+          <div class="left">
+            <div class="surah-num">${s.number}</div>
+            <div class="surah-names">
+              <b>${s.englishName}</b>
+              <span>${s.englishNameTranslation} · ${s.numberOfAyahs} آية · ${s.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
+            </div>
           </div>
-        </div>
-        <div class="ar-name">${s.name}</div>
-      </button>
+          <div class="ar-name">${surahBare(s.name)}</div>
+        </button>
+        ${Favorites.btn(Favorites.surahItem(s))}
+      </div>
     `).join('');
     container.querySelectorAll('.surah-row').forEach(btn=>{
       btn.addEventListener('click', ()=> openSurah(parseInt(btn.dataset.n,10)));
@@ -160,7 +170,7 @@ const QuranModule = (()=>{
       currentPageAyahs = ayahs;
 
       const firstSurah = ayahs[0].surah;
-      document.getElementById('mushafSurahBadge').textContent = `سورة ${firstSurah.name}`;
+      document.getElementById('mushafSurahBadge').textContent = surahLabel(firstSurah.name);
 
       const bismillahEl = document.getElementById('mushafBismillah');
       const isNewSurahStart = ayahs[0].numberInSurah === 1;
@@ -172,14 +182,15 @@ const QuranModule = (()=>{
       ayahs.forEach((a, idx)=>{
         if(a.surah.number !== lastSurahNum){
           if(lastSurahNum !== null){
-            html += `<div class="mushaf-surah-badge" style="display:inline-block;margin:14px 0 10px;">سورة ${a.surah.name}</div><br>`;
+            html += `<div class="mushaf-surah-badge" style="display:inline-block;margin:14px 0 10px;">${surahLabel(a.surah.name)}</div><br>`;
           }
           lastSurahNum = a.surah.number;
           if(a.numberInSurah === 1 && a.surah.number !== 1 && a.surah.number !== 9){
             html += `<div class="mushaf-bismillah" style="margin:6px 0 12px;">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`;
           }
         }
-        html += `<span class="ayah-span" data-idx="${idx}">${a.text} <span class="ayah-num" data-surah="${a.surah.number}" data-ayah="${a.numberInSurah}" data-surah-name="${a.surah.name}" title="اضغط لعرض التفسير">${a.numberInSurah}</span></span> `;
+        const numAr = toArabicDigits(a.numberInSurah);
+        html += `<span class="ayah-span" data-idx="${idx}">${a.text} <span class="ayah-num ${numAr.length >= 3 ? 'd3' : ''}" data-surah="${a.surah.number}" data-ayah="${a.numberInSurah}" data-surah-name="${a.surah.name}" title="اضغط لعرض التفسير وللإضافة للمفضلة">${numAr}</span></span> `;
       });
       textEl.innerHTML = html;
       textEl.querySelectorAll('.ayah-num').forEach(el=>{
@@ -353,7 +364,7 @@ const QuranModule = (()=>{
     renderContinueCard();
   }
 
-  return { onEnter, openSurah, openPage, getSurahs, setLockRange, clearLockRange };
+  return { onEnter, openSurah, openPage, getSurahs, setLockRange, clearLockRange, getAyahInfo };
 })();
 window.QuranModule = QuranModule;
 window.RECITERS = RECITERS;

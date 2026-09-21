@@ -46,7 +46,10 @@ const AzkarModule = (()=>{
         <div class="zikr-card ${done ? 'done' : ''}" data-i="${i}">
           <p class="zikr-text quran-font">${item.text}</p>
           <div class="zikr-foot">
-            <span class="zikr-source">${item.source}</span>
+            <div class="zikr-src-wrap">
+              <span class="zikr-source">${item.source}</span>
+              ${Favorites.btn({ id:`dhikr:${activeCat}:${i}`, type:'dhikr', title:data.title, text:item.text, sub:item.source, data:{ cat:activeCat, i } })}
+            </div>
             <div class="zikr-counter">
               <button class="minus-btn" aria-label="إنقاص"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
               <span class="num">${cur} / ${item.count}</span>

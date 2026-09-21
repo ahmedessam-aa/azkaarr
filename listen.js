@@ -12,6 +12,12 @@ const ListenModule = (()=>{
   let recoveryAttempts = 0;
   const MAX_RECOVERY_ATTEMPTS = 4;
   let recovering = false;
+  let repeatOn = localStorage.getItem('azkar_listen_repeat') === '1';
+  const SPEEDS = [1, 1.25, 1.5, 2, 0.75];
+  let speedIdx = Math.max(0, Math.min(SPEEDS.length - 1, parseInt(localStorage.getItem('azkar_listen_speed') || '0', 10) || 0));
+
+  const ICON_PLAY  = '<path d="M8 5.5v13a1 1 0 001.5.86l10.5-6.5a1 1 0 000-1.72L9.5 4.64A1 1 0 008 5.5z"/>';
+  const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14" rx="1.4"/><rect x="14" y="5" width="4" height="14" rx="1.4"/>';
 
   function fullReciters(){
     return RECITERS.filter(r => typeof r.surahUrl === 'function');
@@ -40,6 +46,7 @@ const ListenModule = (()=>{
       audioEl.addEventListener('pause', ()=>{ isPlaying = false; syncPlayButtons(); });
       audioEl.addEventListener('ended', ()=>{
         if(recovering) return; // a stall-recovery reload can spuriously fire ended in rare cases — ignore mid-recovery
+        if(repeatOn){ audioEl.currentTime = 0; attemptPlay(audioEl, 2); return; }
         playSurah(currentSurahNum + 1 <= 114 ? currentSurahNum + 1 : 1);
       });
       audioEl.addEventListener('timeupdate', ()=>{
@@ -135,23 +142,62 @@ const ListenModule = (()=>{
     const el = audioEl;
     if(!el) return;
     const pct = el.duration ? (el.currentTime/el.duration)*100 : 0;
-    document.querySelectorAll('.listen-progress-fill').forEach(f=> f.style.width = pct+'%');
     document.querySelectorAll('.listen-time-cur').forEach(t=> t.textContent = fmtTime(el.currentTime));
     document.querySelectorAll('.listen-time-dur').forEach(t=> t.textContent = fmtTime(el.duration));
-    const seek = document.getElementById('listenSeek');
-    if(seek && el.duration) seek.value = (el.currentTime/el.duration)*100;
+    document.querySelectorAll('.listen-seek').forEach(inp=>{
+      if(inp.dataset.drag) return;          // don't fight the finger while it's dragging the slider
+      inp.value = pct;
+      inp.style.setProperty('--p', pct + '%');
+    });
+  }
+
+  function bindSeek(inp){
+    inp.addEventListener('input', ()=>{
+      inp.style.setProperty('--p', inp.value + '%');
+      if(audioEl && audioEl.duration) audioEl.currentTime = (inp.value/100) * audioEl.duration;
+    });
+    const start = ()=>{ inp.dataset.drag = '1'; };
+    const end = ()=>{ delete inp.dataset.drag; };
+    inp.addEventListener('pointerdown', start);
+    inp.addEventListener('pointerup', end);
+    inp.addEventListener('pointercancel', end);
+    inp.addEventListener('touchend', end);
+    inp.addEventListener('blur', end);
   }
 
   function syncPlayButtons(){
-    const iconSvg = isPlaying
-      ? '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>'
-      : '<polygon points="6,4 20,12 6,20"/>';
-    document.querySelectorAll('.listen-play-icon').forEach(el=> el.innerHTML = iconSvg);
+    document.querySelectorAll('.listen-play-icon').forEach(el=> el.innerHTML = isPlaying ? ICON_PAUSE : ICON_PLAY);
+    const hasSrc = !!(audioEl && audioEl.src);
     const mini = document.querySelector('.mini-player');
-    if(mini) mini.classList.toggle('show', !!(audioEl && audioEl.src));
+    if(mini) mini.classList.toggle('show', hasSrc);
+    document.body.classList.toggle('has-mini', hasSrc);
+    document.querySelectorAll('#listenRepeatBtn').forEach(b=>{
+      b.classList.toggle('on', repeatOn);
+      b.setAttribute('aria-pressed', String(repeatOn));
+    });
+    const sl = document.getElementById('listenSpeedLabel');
+    if(sl) sl.textContent = SPEEDS[speedIdx] + 'x';
     if('mediaSession' in navigator){
       navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
     }
+  }
+
+  function applySpeed(el){
+    if(!el) return;
+    el.defaultPlaybackRate = SPEEDS[speedIdx];
+    el.playbackRate = SPEEDS[speedIdx];
+  }
+  function cycleSpeed(){
+    speedIdx = (speedIdx + 1) % SPEEDS.length;
+    localStorage.setItem('azkar_listen_speed', String(speedIdx));
+    applySpeed(audioEl);
+    syncPlayButtons();
+  }
+  function toggleRepeat(){
+    repeatOn = !repeatOn;
+    localStorage.setItem('azkar_listen_repeat', repeatOn ? '1' : '0');
+    syncPlayButtons();
+    showToast(repeatOn ? 'تكرار السورة: مفعّل' : 'تكرار السورة: متوقف');
   }
 
   function setMediaSession(){
@@ -159,7 +205,7 @@ const ListenModule = (()=>{
     const s = surahMeta(currentSurahNum);
     const r = reciterById(currentReciterId);
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: s ? `سورة ${s.name}` : 'القرآن الكريم',
+      title: s ? surahLabel(s.name) : 'القرآن الكريم',
       artist: r.name,
       album: 'تطبيق أذكاري',
       artwork: [
@@ -179,7 +225,12 @@ const ListenModule = (()=>{
   }
 
   /* ---------------- transport controls ---------------- */
-  function playSurah(number){
+  function playSurah(number, reciterId){
+    if(reciterId && fullReciters().some(r => r.id === reciterId)){
+      currentReciterId = reciterId;
+      localStorage.setItem('azkar_listen_reciter', reciterId);
+      renderReciters();
+    }
     recovering = false;
     recoveryAttempts = 0;
     currentSurahNum = number;
@@ -189,6 +240,7 @@ const ListenModule = (()=>{
 
     const el = getAudioEl();
     el.src = r.surahUrl(number);
+    applySpeed(el);
     lastProgressAt = Date.now();
     attemptPlay(el, 2);
     setMediaSession();
@@ -249,16 +301,19 @@ const ListenModule = (()=>{
     const container = document.getElementById('listenSurahList');
     if(!container) return;
     container.innerHTML = surahsList.map(s => `
-      <button class="surah-row ${s.number===currentSurahNum ? 'active-row' : ''}" data-n="${s.number}">
-        <div class="left">
-          <div class="surah-num">${s.number===currentSurahNum && isPlaying ? '▶' : s.number}</div>
-          <div class="surah-names">
-            <b>${s.englishName}</b>
-            <span>${s.numberOfAyahs} آية · ${s.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
+      <div class="surah-item">
+        <button class="surah-row ${s.number===currentSurahNum ? 'active-row' : ''}" data-n="${s.number}">
+          <div class="left">
+            <div class="surah-num">${s.number===currentSurahNum && isPlaying ? '▶' : s.number}</div>
+            <div class="surah-names">
+              <b>${s.englishName}</b>
+              <span>${s.numberOfAyahs} آية · ${s.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
+            </div>
           </div>
-        </div>
-        <div class="ar-name">${s.name}</div>
-      </button>
+          <div class="ar-name">${surahBare(s.name)}</div>
+        </button>
+        ${Favorites.btn(Favorites.surahItem(s))}
+      </div>
     `).join('');
     container.querySelectorAll('.surah-row').forEach(btn=>{
       btn.addEventListener('click', ()=> playSurah(parseInt(btn.dataset.n,10)));
@@ -277,11 +332,22 @@ const ListenModule = (()=>{
     surahsList = original;
   }
 
+  function currentFavItem(){
+    const s = surahMeta(currentSurahNum) || { number: currentSurahNum, name: `سورة ${currentSurahNum}` };
+    return Favorites.surahItem(s);
+  }
+
   function renderNowPlaying(){
     const s = surahMeta(currentSurahNum);
     const r = reciterById(currentReciterId);
-    document.querySelectorAll('.listen-now-title').forEach(el=> el.textContent = s ? `سورة ${s.name}` : '—');
+    document.querySelectorAll('.listen-now-title').forEach(el=> el.textContent = s ? surahFull(s.name) : '—');
     document.querySelectorAll('.listen-now-reciter').forEach(el=> el.textContent = r ? r.name : '—');
+    // heart buttons follow the surah that is currently loaded in the player
+    document.querySelectorAll('.js-fav-slot').forEach(slot=>{
+      slot.innerHTML = Favorites.btn(currentFavItem(), 'mp-btn');
+    });
+    const lbl = document.getElementById('listenMenuFavLabel');
+    if(lbl) lbl.textContent = Favorites.has(currentFavItem().id) ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة';
     syncPlayButtons();
   }
 
@@ -291,27 +357,69 @@ const ListenModule = (()=>{
     const bar = document.createElement('div');
     bar.className = 'mini-player';
     bar.innerHTML = `
-      <button class="mini-prev" aria-label="السابق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <button class="mini-play-btn" aria-label="تشغيل/إيقاف">
-        <svg class="listen-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
-      </button>
-      <button class="mini-next" aria-label="التالي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-      <div class="mini-info">
-        <b class="listen-now-title">—</b>
-        <span class="listen-now-reciter">—</span>
+      <button class="mp-grip" aria-label="فتح المشغّل"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
+      <button class="mp-close" aria-label="إيقاف التشغيل وإغلاق المشغّل"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="mp-cover"><img src="player-cover.jpg" alt="" width="56" height="56"></div>
+      <div class="mp-mid">
+        <b class="mp-title listen-now-title">—</b>
+        <span class="mp-sub listen-now-reciter">—</span>
+        <input type="range" class="pc-range listen-seek mp-range" min="0" max="100" value="0" step="0.1" aria-label="التقدم في التلاوة">
+        <div class="pc-times"><span class="listen-time-cur">0:00</span><span class="listen-time-dur">0:00</span></div>
       </div>
-      <div class="mini-progress"><i class="listen-progress-fill"></i></div>
-      <button class="mini-stop" aria-label="إيقاف كلي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="mp-ctrl">
+        <button class="mp-btn mp-prev" aria-label="السابق"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="3" height="14" rx="1.2"/><path d="M19 6l-9.5 6 9.5 6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+        <button class="mp-play" aria-label="تشغيل/إيقاف"><svg class="listen-play-icon" viewBox="0 0 24 24" fill="currentColor">${ICON_PLAY}</svg></button>
+        <button class="mp-btn mp-next" aria-label="التالي"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="16" y="5" width="3" height="14" rx="1.2"/><path d="M5 6l9.5 6L5 18z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+        <span class="js-fav-slot"></span>
+      </div>
     `;
     document.body.appendChild(bar);
 
-    bar.querySelector('.mini-play-btn').addEventListener('click', togglePlay);
-    bar.querySelector('.mini-prev').addEventListener('click', ()=> playSurah(currentSurahNum > 1 ? currentSurahNum - 1 : 114));
-    bar.querySelector('.mini-next').addEventListener('click', ()=> playSurah(currentSurahNum < 114 ? currentSurahNum + 1 : 1));
-    bar.querySelector('.mini-stop').addEventListener('click', stopAll);
+    bindSeek(bar.querySelector('.listen-seek'));
+    bar.querySelector('.mp-play').addEventListener('click', togglePlay);
+    bar.querySelector('.mp-prev').addEventListener('click', ()=> playSurah(currentSurahNum > 1 ? currentSurahNum - 1 : 114));
+    bar.querySelector('.mp-next').addEventListener('click', ()=> playSurah(currentSurahNum < 114 ? currentSurahNum + 1 : 1));
+    bar.querySelector('.mp-close').addEventListener('click', stopAll);
+    bar.querySelector('.mp-grip').addEventListener('click', ()=> navigateTo('listen'));
     bar.addEventListener('click', (e)=>{
-      if(e.target.closest('button')) return;
+      if(e.target.closest('button, input')) return;
       navigateTo('listen');
+    });
+    renderNowPlaying();
+  }
+
+  /* ---------------- player card ⋮ menu ---------------- */
+  function initPlayerMenu(){
+    const btn = document.getElementById('listenMenuBtn');
+    const menu = document.getElementById('listenMenu');
+    if(!btn || !menu) return;
+    const closeMenu = ()=>{ menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const willOpen = menu.hidden;
+      if(willOpen) renderNowPlaying();      // refresh the favourite label
+      menu.hidden = !willOpen;
+      btn.setAttribute('aria-expanded', String(willOpen));
+    });
+    document.addEventListener('click', (e)=>{
+      if(!menu.hidden && !e.target.closest('.pc-menu-wrap')) closeMenu();
+    });
+    menu.addEventListener('click', (e)=>{
+      const item = e.target.closest('.pc-menu-item');
+      if(!item) return;
+      closeMenu();
+      const s = surahMeta(currentSurahNum);
+      if(item.dataset.act === 'fav'){
+        Favorites.toggle(currentFavItem());
+        renderNowPlaying();
+      } else if(item.dataset.act === 'mushaf'){
+        navigateTo('quran');
+        QuranModule.openSurah(currentSurahNum);
+      } else if(item.dataset.act === 'share'){
+        const text = `${s ? surahLabel(s.name) : 'القرآن الكريم'} — بصوت ${reciterById(currentReciterId).name}`;
+        if(navigator.share){ navigator.share({ title: 'أذكاري', text }).catch(()=>{}); }
+        else if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=> showToast('تم نسخ اسم السورة والقارئ')).catch(()=>{}); }
+      }
     });
   }
 
@@ -324,9 +432,10 @@ const ListenModule = (()=>{
       document.getElementById('listenPlayBtn').addEventListener('click', togglePlay);
       document.getElementById('listenPrevBtn').addEventListener('click', ()=> playSurah(currentSurahNum > 1 ? currentSurahNum - 1 : 114));
       document.getElementById('listenNextBtn').addEventListener('click', ()=> playSurah(currentSurahNum < 114 ? currentSurahNum + 1 : 1));
-      document.getElementById('listenSeek').addEventListener('input', (e)=>{
-        if(audioEl && audioEl.duration) audioEl.currentTime = (e.target.value/100) * audioEl.duration;
-      });
+      bindSeek(document.querySelector('#listenPlayerCard .listen-seek'));
+      document.getElementById('listenRepeatBtn').addEventListener('click', toggleRepeat);
+      document.getElementById('listenSpeedBtn').addEventListener('click', cycleSpeed);
+      initPlayerMenu();
 
       const list = document.getElementById('listenSurahList');
       list.innerHTML = `<div class="state-msg"><div class="spin"></div>جارِ تحميل قائمة السور…</div>`;
@@ -345,6 +454,6 @@ const ListenModule = (()=>{
     }
   });
 
-  return { onEnter };
+  return { onEnter, playSurah };
 })();
 window.ListenModule = ListenModule;

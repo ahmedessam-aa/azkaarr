@@ -53,7 +53,18 @@ const TafsirModule = (()=>{
     currentSurah = surahNum;
     currentAyah = ayahNum;
     currentSurahName = surahName;
-    document.getElementById('tafsirRef').textContent = `تفسير سورة ${surahName} — آية ${ayahNum}`;
+    document.getElementById('tafsirRef').textContent = `تفسير ${surahLabel(surahName)} — آية ${ayahNum}`;
+    // heart: save this ayah to favourites
+    const info = (window.QuranModule && QuranModule.getAyahInfo) ? QuranModule.getAyahInfo(surahNum, ayahNum) : { text:'', page:1 };
+    const slot = document.getElementById('tafsirFavSlot');
+    if(slot){
+      slot.innerHTML = Favorites.btn({
+        id: `ayah:${surahNum}:${ayahNum}`, type: 'ayah',
+        title: `${surahLabel(surahName)} — آية ${ayahNum}`,
+        text: info.text,
+        data: { surah: surahNum, ayah: ayahNum, page: info.page },
+      }, 'tafsir-fav');
+    }
     renderChips();
     loadTafsir();
     document.getElementById('tafsirSheetOverlay').classList.add('open');

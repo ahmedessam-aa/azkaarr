@@ -1,4 +1,4 @@
-const CACHE_NAME = 'azkar-app-v14';
+const CACHE_NAME = 'azkar-app-v15';
 const APP_SHELL = [
   './',
   './index.html',
@@ -16,6 +16,7 @@ const APP_SHELL = [
   './qibla.js',
   './mosques.js',
   './content-pages.js',
+  './favorites.js',
   './notifications.js',
   './data-azkar.js',
   './data-hadith.js',
@@ -33,6 +34,7 @@ const APP_SHELL = [
   './icon-nav.png',
   './hero-mosque.jpg',
   './footer-mosque.jpg',
+  './player-cover.jpg',
   './adhan.mp3',
   './salawat.mp3'
 ];

@@ -12,7 +12,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Amiri+Quran&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script>
   (function(){
@@ -404,24 +404,62 @@
         <p>اختر سورة وقارئ — تشغيل متصل كامل بدون قطع، ويستمر أثناء تصفح باقي التطبيق</p>
       </div>
 
-      <div class="listen-player-card">
-        <div class="listen-player-top">
-          <button class="listen-side-btn" id="listenPrevBtn" aria-label="السورة السابقة">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      <div class="player-card" id="listenPlayerCard">
+        <div class="pc-top">
+          <div class="pc-cover"><img src="player-cover.jpg" alt="" width="108" height="108"></div>
+          <div class="pc-col">
+            <div class="pc-head">
+              <div class="pc-titles">
+                <b class="pc-title listen-now-title">—</b>
+                <span class="pc-sub">من المصحف الشريف</span>
+              </div>
+              <div class="pc-menu-wrap">
+                <button class="pc-icon-btn" id="listenMenuBtn" aria-label="المزيد" aria-haspopup="true" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+                </button>
+                <div class="pc-menu" id="listenMenu" hidden>
+                  <button class="pc-menu-item" data-act="fav">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg>
+                    <span id="listenMenuFavLabel">إضافة إلى المفضلة</span>
+                  </button>
+                  <button class="pc-menu-item" data-act="mushaf">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.3-4-2-6.5-1.7v13c2.5-.3 4.9.4 6.5 1.7 1.6-1.3 4-2 6.5-1.7v-13c-2.5-.3-4.9.4-6.5 1.7z"/><line x1="12" y1="6.5" x2="12" y2="19.5"/></svg>
+                    <span>فتح في المصحف</span>
+                  </button>
+                  <button class="pc-menu-item" data-act="share">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+                    <span>مشاركة</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <span class="pc-reciter">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v-3a8 8 0 0116 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>
+              <span>القارئ : <i class="listen-now-reciter">—</i></span>
+            </span>
+            <div class="pc-seek">
+              <input type="range" class="pc-range listen-seek" min="0" max="100" value="0" step="0.1" aria-label="التقدم في التلاوة">
+              <div class="pc-times"><span class="listen-time-cur">0:00</span><span class="listen-time-dur">0:00</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="pc-controls">
+          <button class="pc-flat" id="listenRepeatBtn" aria-label="تكرار السورة" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 014-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 01-4 4H3"/></svg>
           </button>
-          <button class="listen-play-main" id="listenPlayBtn" aria-label="تشغيل/إيقاف">
+          <button class="pc-btn" id="listenPrevBtn" aria-label="السورة السابقة">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="3" height="14" rx="1.2"/><path d="M19 6l-9.5 6 9.5 6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="pc-play" id="listenPlayBtn" aria-label="تشغيل/إيقاف">
             <svg class="listen-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg>
           </button>
-          <button class="listen-side-btn" id="listenNextBtn" aria-label="السورة التالية">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          <button class="pc-btn" id="listenNextBtn" aria-label="السورة التالية">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="16" y="5" width="3" height="14" rx="1.2"/><path d="M5 6l9.5 6L5 18z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
           </button>
-        </div>
-        <b class="listen-now-title" style="display:block;text-align:center;font-size:18px;margin-top:12px;">—</b>
-        <span class="listen-now-reciter" style="display:block;text-align:center;font-size:12.5px;color:var(--gold-soft);margin-top:2px;">—</span>
-        <div class="listen-seek-row">
-          <span class="listen-time-cur">0:00</span>
-          <input type="range" id="listenSeek" min="0" max="100" value="0" step="0.1">
-          <span class="listen-time-dur">0:00</span>
+          <button class="pc-flat pc-speed" id="listenSpeedBtn" aria-label="سرعة التشغيل">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17a9 9 0 1117 0"/><path d="M12 14l3-4.5"/></svg>
+            <small id="listenSpeedLabel">1x</small>
+          </button>
         </div>
       </div>
 
@@ -433,6 +471,16 @@
       </div>
 
       <div class="surah-list" id="listenSurahList"></div>
+    </section>
+
+    <!-- ============ المفضلة ============ -->
+    <section class="page" id="page-favorites">
+      <div class="page-head" style="padding:0 0 4px;">
+        <h1>المفضلة</h1>
+        <p id="favoritesCount">—</p>
+      </div>
+      <div class="reciter-bar" id="favoritesFilters" style="display:none;"></div>
+      <div id="favoritesList"></div>
     </section>
 
     <!-- ============ PRAYER TIMES ============ -->
@@ -542,6 +590,7 @@
         <div class="hadith-meta">
           <span class="src" id="hadithPageMeta">—</span>
           <div class="hadith-nav">
+            <span id="hadithFavSlot"></span>
             <button id="hadithPrevBtn" aria-label="السابق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
             <button id="hadithNextBtn" aria-label="التالي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
           </div>
@@ -743,6 +792,11 @@
 <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span>
 <span class="lbl">الرئيسية</span>
 </button>
+<button class="more-item" data-nav="favorites">
+<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg></span>
+<span class="lbl">المفضلة</span>
+<span class="fav-count" data-fav-count style="display:none;">0</span>
+</button>
 <div class="more-parent">
 <button class="more-item more-toggle-row" data-toggle aria-expanded="false" aria-controls="sub-quran">
 <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.3-4-2-6.5-1.7v13c2.5-.3 4.9.4 6.5 1.7 1.6-1.3 4-2 6.5-1.7v-13c-2.5-.3-4.9.4-6.5 1.7z"/><line x1="12" y1="6.5" x2="12" y2="19.5"/></svg></span>
@@ -940,9 +994,12 @@
     <div class="sheet-handle"></div>
     <div class="back-row" style="justify-content:space-between;">
       <h3 id="tafsirRef" style="margin-bottom:0;">التفسير</h3>
-      <button class="tb-icon-btn" id="tafsirCloseBtn" style="background:var(--panel-hi);">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span id="tafsirFavSlot"></span>
+        <button class="tb-icon-btn" id="tafsirCloseBtn" style="background:var(--panel-hi);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
     </div>
     <div class="reciter-bar" id="tafsirEditionBar" style="margin-top:14px;"></div>
     <div id="tafsirBody" style="margin-top:10px;"></div>
@@ -957,6 +1014,7 @@
 <script src="data-seerah.js"></script>
 <script src="data-fatwa.js"></script>
 <script src="data-duas.js"></script>
+<script src="favorites.js"></script>
 <script src="prayer.js"></script>
 <script src="prayer-tracker.js"></script>
 <script src="quran.js"></script>

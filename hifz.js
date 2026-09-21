@@ -348,7 +348,7 @@ const HifzModule = (()=>{
     document.getElementById('hifzPickerView').style.display = 'none';
     document.getElementById('hifzTestView').style.display = 'block';
     const meta = surahsList.find(s=> s.number === number);
-    document.getElementById('hifzSurahTitle').textContent = `سورة ${meta ? meta.name : ''} — ${MODE_LABELS[testMode].title}`;
+    document.getElementById('hifzSurahTitle').textContent = `${meta ? surahLabel(meta.name) : 'سورة'} — ${MODE_LABELS[testMode].title}`;
 
     const list = document.getElementById('hifzAyahList');
     list.innerHTML = `<div class="state-msg"><div class="spin"></div>جارِ تحميل الآيات…</div>`;

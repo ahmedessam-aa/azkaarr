@@ -88,6 +88,7 @@ const MosquesModule = (()=>{
           <b>${m.name}</b>
           <span>${m.distKm < 1 ? Math.round(m.distKm*1000)+' متر' : m.distKm.toFixed(1)+' كم'} — جهة ${bearingToArabicDirection(m.bear)}</span>
         </div>
+        ${Favorites.btn({ id:`mosque:${m.lat.toFixed(4)},${m.lon.toFixed(4)}`, type:'mosque', title:m.name, sub:`${m.distKm < 1 ? Math.round(m.distKm*1000)+' متر' : m.distKm.toFixed(1)+' كم'}`, data:{ url:`https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lon}` } })}
         <a class="mosque-route-btn" href="https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lon}" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
           الطريق

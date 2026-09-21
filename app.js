@@ -55,6 +55,7 @@ function navigateTo(pageId){
   if(pageId === 'qibla' && window.QiblaModule) QiblaModule.onEnter();
   if(pageId === 'mosques' && window.MosquesModule) MosquesModule.onEnter();
   if(pageId === 'duas' && window.DuasModule) DuasModule.onEnter();
+  if(pageId === 'favorites' && window.Favorites) Favorites.onEnter();
   if(pageId === 'prayer' && window.PrayerTrackerModule) PrayerTrackerModule.init();
 }
 
@@ -133,17 +134,25 @@ const HadithPage = (()=>{
     document.getElementById('hadithPageMeta').textContent = `${h.source} — عن ${h.narrator}`;
     document.getElementById('hadithCounter').textContent = `حديث ${idx+1} من ${HADITH_DATA.length}`;
     localStorage.setItem('azkar_hadith_idx', String(idx));
+    const slot = document.getElementById('hadithFavSlot');
+    if(slot){
+      slot.innerHTML = Favorites.btn({
+        id: `hadith:${idx}`, type: 'hadith', title: 'حديث شريف', text: h.text,
+        sub: `${h.source} — عن ${h.narrator}`, data: { idx },
+      });
+    }
   }
   function next(){ idx = (idx+1) % HADITH_DATA.length; render(); }
   function prev(){ idx = (idx-1+HADITH_DATA.length) % HADITH_DATA.length; render(); }
   function random(){ idx = Math.floor(Math.random()*HADITH_DATA.length); render(); }
   function onEnter(){ render(); }
+  function show(i){ if(typeof i === 'number' && HADITH_DATA[i]){ idx = i; } render(); }
 
   document.getElementById('hadithNextBtn').addEventListener('click', next);
   document.getElementById('hadithPrevBtn').addEventListener('click', prev);
   document.getElementById('hadithRandomBtn').addEventListener('click', random);
 
-  return { onEnter };
+  return { onEnter, show };
 })();
 window.HadithPage = HadithPage;
 
@@ -416,7 +425,7 @@ async function initLaunchSplash(){
     const json = await res.json();
     const d = json.data;
     textEl.textContent = d.text;
-    refEl.textContent = `سورة ${d.surah.name} — آية ${d.numberInSurah}`;
+    refEl.textContent = `${surahLabel(d.surah.name)} — آية ${d.numberInSurah}`;
   }catch(e){
     const pick = FALLBACK_AYAHS[Math.floor(Math.random()*FALLBACK_AYAHS.length)];
     textEl.textContent = pick.text;
@@ -447,6 +456,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     navigator.serviceWorker.register('service-worker.js').catch(()=>{});
   }
 
+  Favorites.init();
   PrayerModule.init();
   TasbihModule.init();
   AzkarModule.init();

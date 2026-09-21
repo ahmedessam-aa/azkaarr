@@ -8,6 +8,7 @@ const ProphetsModule = (()=>{
     const list = document.getElementById('prophetsList');
     list.innerHTML = PROPHETS_DATA.map((p, i) => `
       <div class="prophet-card" data-i="${i}">
+        <div class="prophet-head-row">
         <button class="prophet-head">
           <div class="prophet-name-wrap">
             <span class="prophet-order">${p.order}</span>
@@ -18,6 +19,8 @@ const ProphetsModule = (()=>{
           </div>
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </button>
+        ${Favorites.btn({ id:`prophet:${i}`, type:'prophet', title:p.name, text:p.summary, sub:p.title, data:{ i } })}
+        </div>
         <div class="prophet-body">
           <p>${p.summary}</p>
           <span class="prophet-lineage">🔗 ${p.lineage}</span>
@@ -63,13 +66,16 @@ const SeerahModule = (()=>{
     const wrap = document.getElementById('seerahTimeline');
     const items = SEERAH_DATA[activeEra].items;
     wrap.innerHTML = items.map((it, i) => `
-      <div class="seerah-item">
+      <div class="seerah-item" data-i="${i}">
         <div class="seerah-dot-col">
           <span class="seerah-dot"></span>
           ${i < items.length-1 ? '<span class="seerah-line"></span>' : ''}
         </div>
         <div class="seerah-content">
-          <span class="seerah-year">${it.year}</span>
+          <div class="seerah-yr-row">
+            <span class="seerah-year">${it.year}</span>
+            ${Favorites.btn({ id:`seerah:${activeEra}:${i}`, type:'seerah', title:it.title, text:it.text, sub:[it.year, SEERAH_DATA[activeEra].era].filter(Boolean).join(' — '), data:{ era:activeEra, i } })}
+          </div>
           <h4>${it.title}</h4>
           <p>${it.text}</p>
         </div>
@@ -84,7 +90,18 @@ const SeerahModule = (()=>{
       renderTimeline();
     }
   }
-  return { onEnter };
+  // jump to a specific era / event (used by the favourites page)
+  function show(era, i){
+    onEnter();
+    activeEra = era || 0;
+    renderTabs();
+    renderTimeline();
+    setTimeout(()=>{
+      const el = document.querySelector(`#seerahTimeline .seerah-item[data-i="${i}"]`);
+      if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 320);
+  }
+  return { onEnter, show };
 })();
 window.SeerahModule = SeerahModule;
 
@@ -93,17 +110,20 @@ const FatwaModule = (()=>{
   let loaded = false;
   function render(){
     const wrap = document.getElementById('fatwaList');
-    wrap.innerHTML = FATWA_SOURCES.map(cat => `
+    wrap.innerHTML = FATWA_SOURCES.map((cat, ci) => `
       <div class="section-title" style="margin-top:18px;"><h2>${cat.category}</h2></div>
       <div class="fatwa-grid">
-        ${cat.items.map(it => `
-          <a class="fatwa-card" href="${it.url}" target="_blank" rel="noopener">
-            <div class="fatwa-card-txt">
-              <b>${it.name}</b>
-              <span>${it.desc}</span>
-            </div>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
-          </a>
+        ${cat.items.map((it, ii) => `
+          <div class="fatwa-item">
+            <a class="fatwa-card" href="${it.url}" target="_blank" rel="noopener">
+              <div class="fatwa-card-txt">
+                <b>${it.name}</b>
+                <span>${it.desc}</span>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+            </a>
+            ${Favorites.btn({ id:`fatwa:${ci}:${ii}`, type:'fatwa', title:it.name, text:it.desc, sub:cat.category, data:{ url:it.url } })}
+          </div>
         `).join('')}
       </div>
     `).join('');
@@ -124,6 +144,7 @@ const DuasModule = (()=>{
       <div class="section-title" style="margin-top:${ci===0?'0':'18px'};"><h2>${cat.icon} ${cat.category}</h2></div>
       ${cat.items.map((it, ii) => `
         <div class="prophet-card" data-cat="${ci}" data-i="${ii}">
+          <div class="prophet-head-row">
           <button class="prophet-head">
             <div class="prophet-name-wrap">
               <b>دعاء ${ii+1}</b>
@@ -131,6 +152,8 @@ const DuasModule = (()=>{
             </div>
             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </button>
+          ${Favorites.btn({ id:`dua:${ci}:${ii}`, type:'dua', title:`${cat.category} — دعاء ${ii+1}`, text:it.text, sub:it.source, data:{ ci, ii } })}
+          </div>
           <div class="prophet-body">
             <p class="quran-font" style="font-size:17px; line-height:2;">${it.text}</p>
           </div>
