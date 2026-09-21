@@ -315,17 +315,39 @@ const QuranModule = (()=>{
   /* ---------------- swipe navigation ---------------- */
   function initSwipe(){
     const frame = document.querySelector('.mushaf-frame');
-    let startX = null;
-    frame.addEventListener('touchstart', (e)=>{ startX = e.touches[0].clientX; }, {passive:true});
+    let startX = null, startY = null;
+    const reset = ()=>{ startX = null; startY = null; };
+
+    frame.addEventListener('touchstart', (e)=>{
+      // ignore multi-touch gestures (pinch-zoom etc.) entirely
+      if(e.touches.length !== 1){ reset(); return; }
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, {passive:true});
+
+    frame.addEventListener('touchmove', (e)=>{
+      if(startX == null || startY == null || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      // the instant the gesture reveals itself as a vertical scroll (reading down the page,
+      // or the diagonal "next line" sweep), stop treating it as a page-swipe candidate —
+      // this is what was causing the page to flip on its own while just scrolling/reading
+      if(Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)){ reset(); }
+    }, {passive:true});
+
     frame.addEventListener('touchend', (e)=>{
-      if(startX == null) return;
+      if(startX == null || startY == null) return;
       const dx = e.changedTouches[0].clientX - startX;
-      if(Math.abs(dx) > 60){
+      const dy = e.changedTouches[0].clientY - startY;
+      // require a clearly horizontal, deliberate swipe: enough distance, and mostly horizontal
+      if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5){
         if(dx < 0) openPage(currentPage + 1);
         else openPage(currentPage - 1);
       }
-      startX = null;
+      reset();
     }, {passive:true});
+
+    frame.addEventListener('touchcancel', reset, {passive:true});
   }
 
   function initReaderNav(){

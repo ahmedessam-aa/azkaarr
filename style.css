@@ -45,8 +45,8 @@
 html[data-theme="light"]{
   --night: #ffffff;
   --night-2: #ffffff;
-  --panel: #f9f6ee;
-  --panel-hi: #f3eee0;
+  --panel: #fbfaf6;
+  --panel-hi: #fbfaf6;
   --panel-hover: #ece5d2;
   --ink: #1f2a24;
   --ink-soft: #5b665d;
@@ -391,6 +391,35 @@ main.pages{ max-width:900px; margin:0 auto; padding:14px 14px calc(94px + var(--
 .switch input:checked + .slider::before{ transform:translateX(-19px); }
 
 .install-btn-row{ margin-top:16px; }
+
+/* custom time-based reminders (Notifications sheet) */
+.notif-custom-section{ margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+.notif-custom-section h4{ font-size:14px; font-weight:800; color:var(--ink); margin-bottom:3px; }
+.notif-custom-section .hint{ font-size:12px; color:var(--ink-soft); margin-bottom:12px; }
+.custom-reminder-form{ display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.custom-reminder-form input[type="text"]{
+  flex:1; min-width:0; background:var(--panel); border:1px solid var(--line); border-radius:11px;
+  padding:10px 12px; font-family:inherit; font-size:13.5px; color:var(--ink); outline:none;
+}
+.custom-reminder-form input[type="time"]{
+  width:108px; flex:none; background:var(--panel); border:1px solid var(--line); border-radius:11px;
+  padding:9px 8px; font-family:inherit; font-size:13px; color:var(--ink); outline:none;
+}
+.custom-reminder-form button{
+  flex:none; width:auto; padding:0 16px; height:40px; border-radius:11px; font-size:13.5px;
+}
+.custom-reminder-list{ display:flex; flex-direction:column; gap:8px; }
+.custom-reminder-row{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+}
+.custom-reminder-row .txt{ min-width:0; }
+.custom-reminder-row .txt b{ display:block; font-size:13.5px; font-weight:700; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.custom-reminder-row .txt span{ font-family:'Cairo',sans-serif; font-size:12px; color:var(--emerald-bright); font-weight:700; }
+.custom-reminder-row .actions{ display:flex; align-items:center; gap:8px; flex:none; }
+.custom-reminder-row .del-btn{ width:30px; height:30px; border-radius:9px; background:rgba(255,80,80,.12); color:#e05252; display:flex; align-items:center; justify-content:center; flex:none; }
+.custom-reminder-row .del-btn svg{ width:15px; height:15px; }
+.custom-reminder-empty{ font-size:12.5px; color:var(--ink-faint); text-align:center; padding:14px 0; }
 .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 18px; border-radius:12px; font-weight:800; font-size:15px; width:100%; transition:transform .15s ease, box-shadow .2s ease; }
 .btn:active{ transform:scale(.98); }
 .btn svg{ width:16px; height:16px; }
@@ -444,6 +473,10 @@ main.pages{ max-width:900px; margin:0 auto; padding:14px 14px calc(94px + var(--
 .reciter-chip{ flex:none; display:flex; align-items:center; gap:6px; padding:9px 14px; border-radius:999px; background:var(--panel); border:1px solid var(--line); font-size:13px; font-weight:700; color:var(--ink-soft); }
 .reciter-chip.active{ background:var(--emerald); color:#04140d; border-color:var(--emerald); }
 
+/* wrap-bar: same chips, same size/shape — but wraps onto multiple lines to fit
+   the phone width instead of scrolling off-screen in one row (used on the Listen page) */
+.reciter-bar.wrap-bar{ flex-wrap:wrap; overflow-x:visible; row-gap:8px; }
+
 .surah-list{ display:flex; flex-direction:column; gap:7px; }
 .surah-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:11px 14px; }
 .surah-row.active-row{ border-color:var(--gold-line); background:linear-gradient(90deg, rgba(215,174,92,.08), var(--panel)); }
@@ -469,13 +502,13 @@ main.pages{ max-width:900px; margin:0 auto; padding:14px 14px calc(94px + var(--
 .mushaf-text .ayah-span.playing{ background:var(--emerald-tint); }
 .ayah-num{
   position:relative; display:inline-flex; align-items:center; justify-content:center; width:33px; height:33px; margin:0 4px;
-  vertical-align:middle; font-family:var(--font-quran); font-size:15px; line-height:1; color:var(--gold); cursor:pointer;
+  vertical-align:middle; font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; line-height:1; color:var(--gold); cursor:pointer;
 }
 .ayah-num::before{
   content:''; position:absolute; inset:0; background:var(--gold); opacity:.85;
   -webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cg%20fill='none'%20stroke='%23000'%20stroke-width='1.6'%3E%3Ccircle%20cx='20'%20cy='20'%20r='15.5'/%3E%3Ccircle%20cx='20'%20cy='20'%20r='12'%20stroke-width='1.1'/%3E%3C/g%3E%3Cg%20fill='%23000'%3E%3Ccircle%20cx='20'%20cy='3.6'%20r='2.1'/%3E%3Ccircle%20cx='20'%20cy='36.4'%20r='2.1'/%3E%3Ccircle%20cx='3.6'%20cy='20'%20r='2.1'/%3E%3Ccircle%20cx='36.4'%20cy='20'%20r='2.1'/%3E%3Ccircle%20cx='8.4'%20cy='8.4'%20r='1.5'/%3E%3Ccircle%20cx='31.6'%20cy='8.4'%20r='1.5'/%3E%3Ccircle%20cx='8.4'%20cy='31.6'%20r='1.5'/%3E%3Ccircle%20cx='31.6'%20cy='31.6'%20r='1.5'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat; mask:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2040%2040'%3E%3Cg%20fill='none'%20stroke='%23000'%20stroke-width='1.6'%3E%3Ccircle%20cx='20'%20cy='20'%20r='15.5'/%3E%3Ccircle%20cx='20'%20cy='20'%20r='12'%20stroke-width='1.1'/%3E%3C/g%3E%3Cg%20fill='%23000'%3E%3Ccircle%20cx='20'%20cy='3.6'%20r='2.1'/%3E%3Ccircle%20cx='20'%20cy='36.4'%20r='2.1'/%3E%3Ccircle%20cx='3.6'%20cy='20'%20r='2.1'/%3E%3Ccircle%20cx='36.4'%20cy='20'%20r='2.1'/%3E%3Ccircle%20cx='8.4'%20cy='8.4'%20r='1.5'/%3E%3Ccircle%20cx='31.6'%20cy='8.4'%20r='1.5'/%3E%3Ccircle%20cx='8.4'%20cy='31.6'%20r='1.5'/%3E%3Ccircle%20cx='31.6'%20cy='31.6'%20r='1.5'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
 }
-.ayah-num.d3{ font-size:13px; }
+.ayah-num.d3{ font-size:11px; }
 
 .mushaf-nav-row{ display:flex; align-items:center; gap:10px; margin-top:14px; }
 .mushaf-nav-btn{ flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:12px; border-radius:12px; background:var(--panel-hi); border:1px solid var(--line); font-size:14px; font-weight:700; color:var(--ink); }

@@ -463,7 +463,7 @@
         </div>
       </div>
 
-      <div class="reciter-bar" id="listenReciterBar"></div>
+      <div class="reciter-bar wrap-bar" id="listenReciterBar"></div>
 
       <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -914,9 +914,13 @@
 </div></div></div>
 </div>
 <div class="more-sep"></div>
+<button class="more-item" id="moreNotifItem">
+<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
+<span class="lbl">الإشعارات</span>
+</button>
 <button class="more-item" id="moreSettingsItem">
 <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.23.5.63.9 1.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
-<span class="lbl">الإعدادات والإشعارات</span>
+<span class="lbl">الإعدادات</span>
 </button>
 </nav>
   </div>
@@ -937,7 +941,30 @@
   <div class="sheet-overlay" id="sheetOverlay"></div>
   <div class="sheet" id="settingsSheet">
     <div class="sheet-handle"></div>
-    <h3>الإعدادات والإشعارات</h3>
+    <h3>الإعدادات</h3>
+
+    <div class="settings-row">
+      <div class="info">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16M16 4v16M4 8v8M20 8v8"/></svg></span>
+        <div class="txt"><b>اهتزاز السبحة</b><span>اهتزاز خفيف عند كل تسبيحة (موبايل)</span></div>
+      </div>
+      <label class="switch"><input type="checkbox" id="toggleVibrate" checked><span class="slider"></span></label>
+    </div>
+
+    <div class="install-btn-row">
+      <button class="btn btn-gold" id="installBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        تحميل تطبيق أذكاري
+      </button>
+      <p id="installHint" style="font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:10px;">ثبّت التطبيق على شاشتك الرئيسية ليعمل مثل أي تطبيق آخر</p>
+    </div>
+  </div>
+
+  <!-- ============ NOTIFICATIONS SHEET ============ -->
+  <div class="sheet-overlay" id="notifSheetOverlay"></div>
+  <div class="sheet" id="notifSheet">
+    <div class="sheet-handle"></div>
+    <h3>الإشعارات</h3>
 
     <div class="settings-row">
       <div class="info">
@@ -971,20 +998,15 @@
       <label class="switch"><input type="checkbox" id="toggleSalawatNotif"><span class="slider"></span></label>
     </div>
 
-    <div class="settings-row">
-      <div class="info">
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16M16 4v16M4 8v8M20 8v8"/></svg></span>
-        <div class="txt"><b>اهتزاز السبحة</b><span>اهتزاز خفيف عند كل تسبيحة (موبايل)</span></div>
+    <div class="notif-custom-section">
+      <h4>تذكيرات مخصّصة</h4>
+      <p class="hint">أضف أي تذكير تحب تتنبّه له في وقت وساعة تحددها بنفسك</p>
+      <div class="custom-reminder-form">
+        <input type="text" id="customReminderText" placeholder="اكتب نص التذكير…" maxlength="60">
+        <input type="time" id="customReminderTime" value="08:00">
+        <button class="btn btn-gold" id="addCustomReminderBtn">إضافة</button>
       </div>
-      <label class="switch"><input type="checkbox" id="toggleVibrate" checked><span class="slider"></span></label>
-    </div>
-
-    <div class="install-btn-row">
-      <button class="btn btn-gold" id="installBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        تحميل تطبيق أذكاري
-      </button>
-      <p id="installHint" style="font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:10px;">ثبّت التطبيق على شاشتك الرئيسية ليعمل مثل أي تطبيق آخر</p>
+      <div class="custom-reminder-list" id="customReminderList"></div>
     </div>
   </div>
 

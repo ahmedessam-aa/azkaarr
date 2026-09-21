@@ -125,6 +125,40 @@ const NotificationsModule = (()=>{
     document.removeEventListener('touchstart', unlockAudioOnce);
   }
 
+  /* ---------------- custom (user-added) time-based reminders ---------------- */
+  const CUSTOM_KEY = 'azkar_custom_reminders';
+
+  function getCustomReminders(){
+    try{
+      const raw = localStorage.getItem(CUSTOM_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+
+  function saveCustomReminders(list){
+    localStorage.setItem(CUSTOM_KEY, JSON.stringify(list));
+  }
+
+  function addCustomReminder(text, time){
+    const list = getCustomReminders();
+    list.push({ id: 'cr' + Date.now(), text: text.trim(), time, enabled: true });
+    saveCustomReminders(list);
+    refreshSchedules();
+  }
+
+  function removeCustomReminder(id){
+    saveCustomReminders(getCustomReminders().filter(r => r.id !== id));
+    refreshSchedules();
+  }
+
+  function toggleCustomReminder(id){
+    const list = getCustomReminders();
+    const item = list.find(r => r.id === id);
+    if(item) item.enabled = !item.enabled;
+    saveCustomReminders(list);
+    refreshSchedules();
+  }
+
   /* ---------------- prayer / azkar / hadith schedule ---------------- */
   function todayStr(){
     const d = new Date();
@@ -164,6 +198,11 @@ const NotificationsModule = (()=>{
       const h = HADITH_DATA[idx];
       schedule.push({ time:'09:00', type:'basic', title:'حديث اليوم', body: h.text.slice(0,80) + '…', tag:'daily-hadith' });
     }
+
+    getCustomReminders().forEach(r=>{
+      if(!r.enabled || !r.time) return;
+      schedule.push({ time:r.time, type:'basic', title:r.text || 'تذكير', body:r.text || 'حان وقت تذكيرك', tag:'custom-'+r.id });
+    });
 
     return schedule;
   }
@@ -206,8 +245,9 @@ const NotificationsModule = (()=>{
 
   function refreshSchedules(){
     clearInterval(checkInterval);
-    const anyOn = ['notif_prayer','notif_azkar','notif_hadith','notif_salawat'].some(k => localStorage.getItem(k) === '1');
-    if(!anyOn) return;
+    const anyToggleOn = ['notif_prayer','notif_azkar','notif_hadith','notif_salawat'].some(k => localStorage.getItem(k) === '1');
+    const anyCustomOn = getCustomReminders().some(r => r.enabled);
+    if(!anyToggleOn && !anyCustomOn) return;
     checkInterval = setInterval(checkTick, 15000);
     checkTick();
   }
@@ -222,6 +262,9 @@ const NotificationsModule = (()=>{
     document.addEventListener('touchstart', unlockAudioOnce, { once:false, passive:true });
   }
 
-  return { requestPermission, refreshSchedules, init };
+  return {
+    requestPermission, refreshSchedules, init,
+    getCustomReminders, addCustomReminder, removeCustomReminder, toggleCustomReminder
+  };
 })();
 window.NotificationsModule = NotificationsModule;

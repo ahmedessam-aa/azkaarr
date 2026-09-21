@@ -272,11 +272,18 @@ function initMoreSheet(){
   sheet.querySelectorAll('.more-item:not([data-toggle])').forEach(item=>{
     item.addEventListener('click', close);
   });
-  // "الإعدادات والإشعارات" inside the menu opens the settings sheet
+  // "الإعدادات" داخل القائمة تفتح شاشة الإعدادات (بنفس زر الترس في الشريط العلوي)
   const settingsItem = document.getElementById('moreSettingsItem');
   if(settingsItem){
     settingsItem.addEventListener('click', ()=>{
       setTimeout(()=> document.getElementById('settingsBtn').click(), 180);
+    });
+  }
+  // "الإشعارات" داخل القائمة تفتح شاشة الإشعارات الخاصة بيها (مُعرّفة في initNotifSheet)
+  const notifItem = document.getElementById('moreNotifItem');
+  if(notifItem){
+    notifItem.addEventListener('click', ()=>{
+      setTimeout(()=> window.openNotifSheet && window.openNotifSheet(), 180);
     });
   }
 }
@@ -336,7 +343,7 @@ function initHeaderSearch(){
 }
 
 /* =========================================================
-   Settings sheet
+   Settings sheet (عامة: اهتزاز السبحة + تثبيت التطبيق)
    ========================================================= */
 function initSettingsSheet(){
   const sheet = document.getElementById('settingsSheet');
@@ -349,20 +356,41 @@ function initSettingsSheet(){
   initHeaderSearch();
   overlay.addEventListener('click', close);
 
+  const el = document.getElementById('toggleVibrate');
+  const key = 'tasbih_vibrate';
+  const saved = localStorage.getItem(key);
+  el.checked = saved === null ? true : saved === '1';
+  el.addEventListener('change', ()=>{
+    localStorage.setItem(key, el.checked ? '1' : '0');
+    if(window.TasbihModule) TasbihModule.setVibrate(el.checked);
+  });
+}
+
+/* =========================================================
+   Notifications sheet (تنبيهات ثابتة + تذكيرات مخصّصة بالوقت)
+   ========================================================= */
+function initNotifSheet(){
+  const sheet = document.getElementById('notifSheet');
+  const overlay = document.getElementById('notifSheetOverlay');
+  const open = ()=>{ renderCustomReminders(); sheet.classList.add('open'); overlay.classList.add('open'); };
+  const close = ()=>{ sheet.classList.remove('open'); overlay.classList.remove('open'); };
+  window.openNotifSheet = open;
+
+  overlay.addEventListener('click', close);
+
   // toggles persistence
   const toggles = {
     togglerPrayerNotif: 'notif_prayer',
     toggleAzkarNotif: 'notif_azkar',
     toggleHadithNotif: 'notif_hadith',
     toggleSalawatNotif: 'notif_salawat',
-    toggleVibrate: 'tasbih_vibrate',
   };
   Object.entries(toggles).forEach(([elId, key])=>{
     const el = document.getElementById(elId);
     const saved = localStorage.getItem(key);
-    el.checked = saved === null ? (key==='tasbih_vibrate') : saved === '1';
+    el.checked = saved === '1';
     el.addEventListener('change', async ()=>{
-      if(el.checked && key !== 'tasbih_vibrate'){
+      if(el.checked){
         const granted = await NotificationsModule.requestPermission();
         if(!granted){
           showToast('لن تظهر إشعارات النظام، لكن التنبيه والصوت داخل التطبيق هيفضلوا شغالين طول ما التطبيق مفتوح');
@@ -370,7 +398,56 @@ function initSettingsSheet(){
       }
       localStorage.setItem(key, el.checked ? '1' : '0');
       NotificationsModule.refreshSchedules();
-      if(key === 'tasbih_vibrate' && window.TasbihModule) TasbihModule.setVibrate(el.checked);
+    });
+  });
+
+  // custom time-based reminders
+  const textInput = document.getElementById('customReminderText');
+  const timeInput = document.getElementById('customReminderTime');
+  document.getElementById('addCustomReminderBtn').addEventListener('click', async ()=>{
+    const text = textInput.value.trim();
+    if(!text){ showToast('اكتب نص التذكير الأول'); return; }
+    if(!timeInput.value){ showToast('اختر الوقت'); return; }
+    const granted = await NotificationsModule.requestPermission();
+    if(!granted){
+      showToast('لن تظهر إشعارات النظام، لكن التنبيه داخل التطبيق هيفضل شغال طول ما التطبيق مفتوح');
+    }
+    NotificationsModule.addCustomReminder(text, timeInput.value);
+    textInput.value = '';
+    renderCustomReminders();
+  });
+}
+
+function renderCustomReminders(){
+  const list = document.getElementById('customReminderList');
+  if(!list) return;
+  const reminders = NotificationsModule.getCustomReminders();
+  if(!reminders.length){
+    list.innerHTML = `<div class="custom-reminder-empty">لسه مفيش تذكيرات مضافة</div>`;
+    return;
+  }
+  list.innerHTML = reminders.map(r => `
+    <div class="custom-reminder-row" data-id="${r.id}">
+      <div class="txt"><b>${r.text}</b><span>${r.time}</span></div>
+      <div class="actions">
+        <label class="switch">
+          <input type="checkbox" class="custom-reminder-toggle" ${r.enabled ? 'checked' : ''}>
+          <span class="slider"></span>
+        </label>
+        <button class="del-btn" aria-label="حذف">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+  list.querySelectorAll('.custom-reminder-row').forEach(row=>{
+    const id = row.dataset.id;
+    row.querySelector('.custom-reminder-toggle').addEventListener('change', ()=>{
+      NotificationsModule.toggleCustomReminder(id);
+    });
+    row.querySelector('.del-btn').addEventListener('click', ()=>{
+      NotificationsModule.removeCustomReminder(id);
+      renderCustomReminders();
     });
   });
 }
@@ -449,6 +526,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   renderHomeHadith();
   renderHomeAzkarChips();
   initSettingsSheet();
+  initNotifSheet();
   initMoreSheet();
   initThemeToggle();
 
